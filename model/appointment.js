@@ -1,34 +1,21 @@
 const pool = require("../config/db.js");
+const moment = require("moment")
 
-function getEvents(userId, type, date) {
-  let selectedDate = newDate(date)
-  let firstDate = null;
-  let lastDate = null;
-  switch (type) {
-    case 'monthly':
-      firstDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-      lastDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
-      break;
-    case 'weekly':
-      firstDate = new Date(selectedDate.getFullYear(), selectedDate.getWeek(), 1);
-      lastDate = new Date(selectedDate.getFullYear(), selectedDate.getWeek() + 1, 0);
-      break;
-    case 'daily':
-      firstDate = selectedDate;
-      lastDate = selectedDate;
-      break;
-  }
-  const SQL = `SELECT * from caseappointment
-               LEFT JOIN appuser ON caseappointment.caseId = appuser.caseId and appuser.userId = ?
-               WHERE 
-                caseappointment.appointmentDateTime BETWEEN ? AND ? `;
+async function getEvents(values) {
+  const {userId, startDate, endDate} = values;
+  const firstDate = moment(new Date(startDate)).valueOf();
+  const lastDate = moment(new Date(endDate)).valueOf();;
+  const SQL = `SELECT * from caseappointment as ca
+               LEFT JOIN appuser as au ON ca.caseId = au.caseId and au.userId = ?
+               where ca.appointmentDateTime >= ? and ca.appointmentDateTime <= ?;`;
+  const sres = await pool.query(SQL, [userId, firstDate, lastDate]);
   return new Promise((resolve, reject) => {
-    pool.query(SQL, [firstDate, lastDate, userId], (err, result) => {
+    pool.query(SQL, [Number(userId), firstDate, lastDate], (err, result) => {
       if (err) {
         console.log(err);
         resolve({
           isError: true,
-          err: err,
+          errpr: err,
         })
       } else {
         resolve({
