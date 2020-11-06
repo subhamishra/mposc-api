@@ -34,4 +34,21 @@ router.get('/list/:typeId', async function (req, res, next) {
   }
 });
 
+router.post('/list', async function (req, res, next) {
+  const typeId = req.params.typeId;
+  const data = await lookuptype.lookupTypeId(typeId, '');
+  const appUser = data.result && data.result.length > 0 ? data.result : {};
+  if (!appUser) {
+    res.send({
+      isError: true,
+      error: data.err
+    });
+  } else {
+    res.send({
+      isError: false,
+      data: appUser
+    });
+  }
+});
+
 module.exports = router;

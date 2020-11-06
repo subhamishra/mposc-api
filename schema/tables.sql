@@ -16,7 +16,10 @@ CREATE TABLE `appuser` (
   `secretKeyGeneratedAt` bigint(20) DEFAULT NULL,
   `secretKeyUsed` tinyint(1) DEFAULT NULL,
   `caseId` int(11) DEFAULT NULL,
+  `points` int(20) DEFAULT 0,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `userId` (`userId`),
   UNIQUE KEY `emailAddress` (`emailAddress`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `lookup` ADD `points` int(10) DEFAULT NULL;
