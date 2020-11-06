@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const getEvents = require('../model/appointment.js').getEvents;
+const getEvents = require('../model/appointment.js').getEventByUserId;
 
 router.get('/', async function (req, res, next) {
   const userId = req.query.userId;
