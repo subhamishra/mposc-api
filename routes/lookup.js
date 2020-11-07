@@ -1,52 +1,43 @@
 var express = require('express');
 var router = express.Router();
-const lookuptype = require('../model/lookuptype.js')
+const lookup = require('../model/lookup.js')
+// const 
 
 router.get('/types', async function (req, res, next) {
-  const data = await lookuptype.lookuptype('');
-  const appUser = data.result && data.result.length > 0 ? data.result : {};
-  if (!appUser) {
-    res.send({
-      isError: true,
-      error: data.err
-    });
+  const data = await lookup.lookuptype('');
+  if (data.isError) {
+    res.send(data);
   } else {
     res.send({
-      data: appUser
+      isError: false,
+      data: data.result
     });
   }
 });
 
 router.get('/list/:typeId', async function (req, res, next) {
   const typeId = req.params.typeId;
-  const data = await lookuptype.lookupTypeId(typeId, '');
+  const data = await lookup.lookupByTypeId(typeId, '');
   const appUser = data.result && data.result.length > 0 ? data.result : {};
-  if (!appUser) {
-    res.send({
-      isError: true,
-      error: data.err
-    });
+  if (data.isError) {
+    res.send(data);
   } else {
     res.send({
       isError: false,
-      data: appUser
+      data: data.result
     });
   }
 });
 
-router.post('/list', async function (req, res, next) {
-  const typeId = req.params.typeId;
-  const data = await lookuptype.lookupTypeId(typeId, '');
+router.post('/addType', async function (req, res, next) {
+  const data = await lookup.addlookupType(req.body);
   const appUser = data.result && data.result.length > 0 ? data.result : {};
-  if (!appUser) {
-    res.send({
-      isError: true,
-      error: data.err
-    });
+  if (data.isError) {
+    res.send(data);
   } else {
     res.send({
       isError: false,
-      data: appUser
+      message: "successfully added lookup type"
     });
   }
 });
