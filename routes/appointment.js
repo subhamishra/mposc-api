@@ -5,20 +5,14 @@ const updateEvent = require('../model/appointment.js').updateEvent;
 const addEvent = require('../model/appointment.js').addEvent;
 
 router.get('/', async function (req, res, next) {
-  const userId = req.query.userId;
-  const type = req.query.type;
-  const date = req.query.date;
-  const data = await getEvents(userId, type, date);
+  const data = await getEvents(req.query);
   const events = data.result && data.result.length > 0 ? data.result[0] : {};
   if (data.isError) {
-    res.send({
-      isError: true,
-      error: data.err
-    });
+    res.send(data);
   } else {
     res.send({
       isError: false,
-      data: userProfile,
+      data: events,
     });
   }
 });
