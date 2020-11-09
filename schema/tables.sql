@@ -22,4 +22,21 @@ CREATE TABLE `appuser` (
   UNIQUE KEY `emailAddress` (`emailAddress`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `appuseractivity`;
+
+CREATE TABLE `appuseractivity` (
+  `createdAt` bigint(20) DEFAULT NULL,
+  `updatedAt` bigint(20) DEFAULT NULL,
+  `createdByUserId` int(11) DEFAULT NULL,
+  `modifiedByUserId` int(11) DEFAULT NULL,
+  `appuserActivityId` int(11) NOT NULL AUTO_INCREMENT,
+  `appUserId` int(11) NOT NULL,
+  `pointsRedeemed` int(20) DEFAULT 0,
+  `pointsReceived` int(20) DEFAULT 0,
+  `appuserBalancePoints` int(20),
+  `lookupId` int(11),
+  PRIMARY KEY (`appuserActivityId`),
+  UNIQUE KEY `appuserActivityId` (`appuserActivityId`),
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
 ALTER TABLE `lookup` ADD `points` int(10) DEFAULT NULL;
