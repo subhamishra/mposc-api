@@ -27,53 +27,58 @@ async function getEvents(values) {
   })
 }
 
-async function addEvent(req) {
-  const userId = req.body.userId ;
-  const DateTime = req.body.appointmentDateTime;
+function userConform(userId){
+  const getCaseId_SQL = ` select count(*) as userconform, caseId from appuser where userId = ${userId}`;
+  return new Promise((resolve, reject) => {
+    pool.query(getCaseId_SQL,[userId], (err, result) => {
+      if (err) {
+        console.log(err);
+        resolve({
+          isError: true,
+          err: err,
+        })
+      } else {
+        resolve({
+          result: result[0].userconform,
+          caseId: result[0].caseId,
+        })
+      }
+    });
+  });
+}
+
+async function addEvent(details) {
+  const userId = details.userId ;
+  const DateTime = details.appointmentDateTime;
   const appointmentDateTime = moment(new Date(DateTime)).valueOf();
-  const appointmentTypeId = req.body.appointmentTypeId;
-  if(!userId || isNaN(appointmentDateTime) || !appointmentTypeId){
+  const appointmentTypeId = details.appointmentTypeId;
+  const DateTimeEnd = details.appointmentDateTimeEnd;
+  const appointmentDateTimeEnd = moment(new Date(DateTimeEnd)).valueOf();
+  const statusId = details.statusId;
+  const issue = details.issue;
+  const notes = details.notes;
+  const duration =    details.duration  ;
+  if(!userId || !DateTime || !DateTimeEnd || !appointmentTypeId || !statusId || !duration){
     return new Promise((resolve, reject) => {
           resolve({
             isError: false,
             message: "Fill all details"
-          })
+          });
         }
       );
-    }else {
+    } else {
     const checkUser = await userConform(userId);
-    function userConform(userId){
-      const getCaseId_SQL = ` select count(*) as userconform, caseId from appuser where userId = ${userId}`;
-      return new Promise((resolve, reject) => {
-        pool.query(getCaseId_SQL,[userId], (err, result) => {
-          if (err) {
-            console.log(err);
-            resolve({
-              isError: true,
-              error: err,
-            })
-          } else {
-            resolve({
-              result: result[0].userconform,
-              caseId: result[0].caseId,
-            })
-          }
-        });
-      });
-    }
-
     if(!checkUser.result){
       return new Promise((resolve, reject) => {
           resolve({
             isError: false,
-            message: "UserId does not exsist"
+            message: "UserId does not exist",
           })
         }
       );
     }else {
-
       if(checkUser.caseId){
-        const SQL = `INSERT INTO caseappointment SET createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP, createdByUserId = ${userId}, modifiedByUserId = ${userId}, caseId = ${checkUser.caseId}, appointmentDateTime = ${appointmentDateTime}, appointmentTypeId = ${appointmentTypeId}  `;
+        const SQL = `INSERT INTO caseappointment SET createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP, createdByUserId = ${userId}, modifiedByUserId = ${userId}, caseId = ${checkUser.caseId}, appointmentDateTime = ${appointmentDateTime}, appointmentDateTimeEnd = ${appointmentDateTimeEnd} , appointmentTypeId = ${appointmentTypeId} , statusId = ${statusId} , issue = "${issue}" , notes = "${notes}" , duration = "${duration}"`;
         return new Promise((resolve, reject) => {
           pool.query(SQL, (err, result) => {
             if (err) {
@@ -103,13 +108,19 @@ async function addEvent(req) {
   }
 }
 
-async function updateEvent(req) {
-  const userId = req.body.userId;
-  const DateTime = req.body.appointmentDateTime;
+async function updateEvent(details) {
+  const userId = details.userId;
+  const DateTime = details.appointmentDateTime;
   const appointmentDateTime = moment(new Date(DateTime)).valueOf();
-  const appointmentTypeId = req.body.appointmentTypeId;
-  const appointmentId = req.body.appointmentId;
-  if (!userId || isNaN(appointmentDateTime) || !appointmentTypeId || !appointmentId) {
+  const appointmentTypeId = details.appointmentTypeId;
+  const appointmentId = details.appointmentId;
+  const DateTimeEnd = details.appointmentDateTimeEnd;
+  const appointmentDateTimeEnd = moment(new Date(DateTimeEnd)).valueOf();
+  const statusId = details.statusId;
+  const issue = details.issue;
+  const notes = details.notes;
+  const duration = details.duration;
+  if (!userId || !DateTime || !appointmentTypeId || !appointmentId || !DateTimeEnd || !statusId || !duration) {
     return new Promise((resolve, reject) => {
         resolve({
           isError: false,
@@ -119,26 +130,6 @@ async function updateEvent(req) {
     );
   } else {
     const checkUser = await userConform(userId);
-    function userConform(userId){
-      const getCaseId_SQL = ` select count(*) as userconform, caseId from appuser where userId = ${userId}`;
-      return new Promise((resolve, reject) => {
-        pool.query(getCaseId_SQL,[userId], (err, result) => {
-          if (err) {
-            console.log(err);
-            resolve({
-              isError: true,
-              err: err,
-            })
-          } else {
-            resolve({
-              result: result[0].userconform,
-              caseId: result[0].caseId,
-            })
-          }
-        });
-      });
-    }
-
     if(!checkUser.result){
       return new Promise((resolve, reject) => {
           resolve({
@@ -148,30 +139,59 @@ async function updateEvent(req) {
         }
       );
     }else{
-
-      if(checkUser.caseId){
-        const SQL = `UPDATE caseappointment SET updatedAt = CURRENT_TIMESTAMP , modifiedByUserId = ${userId} , caseId = ${checkUser.caseId} ,appointmentDateTime = ${appointmentDateTime} , appointmentTypeId = ${appointmentTypeId} WHERE appointmentId = ${appointmentId}`;
-        return new Promise((resolve, reject) => {
-          pool.query(SQL, (err, result) => {
-            if (err) {
-              console.log(err);
-              resolve({
-                isError: true,
-                err: err,
-              })
-            } else {
-              resolve({
-                isError: false,
-                message: "Appointment updated successfully"
-              })
-            }
+      if(checkUser.caseId ){
+        const checkAppointmentId = await appointmentIdConform(appointmentId);
+        function appointmentIdConform(userId){
+          const getCaseId_SQL = `select count(*) as checkAppointmentId from caseappointment where appointmentId = ${appointmentId}`;
+          return new Promise((resolve, reject) => {
+            pool.query(getCaseId_SQL,[userId], (err, result) => {
+              if (err) {
+                console.log(err);
+                resolve({
+                  isError: true,
+                  err: err,
+                })
+              } else {
+                resolve({
+                  result: result[0].checkAppointmentId,
+                })
+              }
+            });
           });
-        });
+        }
+
+        if(checkAppointmentId.result){
+          const SQL = `UPDATE caseappointment SET updatedAt = CURRENT_TIMESTAMP , modifiedByUserId = ${userId} , caseId = ${checkUser.caseId} ,appointmentDateTime = ${appointmentDateTime}  ,  appointmentDateTimeEnd = ${appointmentDateTimeEnd} , appointmentTypeId = ${appointmentTypeId} , statusId = ${statusId} , issue = "${issue}" , notes = "${notes}" , duration = "${duration}" WHERE appointmentId = ${appointmentId}`;
+          return new Promise((resolve, reject) => {
+            pool.query(SQL, (err, result) => {
+              if (err) {
+                console.log(err);
+                resolve({
+                  isError: true,
+                  err: err,
+                })
+              } else {
+                resolve({
+                  isError: false,
+                  message: "Appointment updated successfully"
+                })
+              }
+            });
+          });
+        }else{
+          return new Promise((resolve, reject) => {
+            resolve({
+              isError: false,
+              message: "AppointmentId does not exists"
+            })
+          });
+        }
+
       }else{
         return new Promise((resolve, reject) => {
           resolve({
             isError: false,
-            message: "CaseId does not exsist for given userId"
+            message: "CaseId does not exists for userId"
           })
         });
       }

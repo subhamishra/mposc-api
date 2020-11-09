@@ -18,7 +18,7 @@ router.get('/', async function (req, res, next) {
 });
 
 router.post('/create', async function (req, res, next) {
-  const data = await addEvent(req);
+  const data = await addEvent(req.body);
   if (data.isError) {
     res.send({
       isError: true,
@@ -30,7 +30,7 @@ router.post('/create', async function (req, res, next) {
 });
 
 router.post('/update', async function (req, res, next) {
-  const data = await updateEvent(req);
+  const data = await updateEvent(req.body);
   if (data.isError) {
     res.send({
       isError: true,
