@@ -25,9 +25,7 @@ router.post('/create', async function (req, res, next) {
       error: data.err
     });
   }else {
-    res.send({
-      message: data.message,
-    });
+    res.send(data);
   }
 });
 
@@ -40,11 +38,9 @@ router.post('/update', async function (req, res, next) {
     });
   }else {
     res.send({
-      isError: false,
-      message: "Appointment updated successfully" ,
+      message: data.message ,
     });
   }
 });
-
 
 module.exports = router;
