@@ -1,14 +1,37 @@
 const Data = [
   {
-    displayValue: 'Safe to Sleep',
-    customValue: null,
-    customStringValue: {
-      description: 'how to safely sleep',
-      source: '/assets/videos',
-      thumbnailSource: '/assets/thumbnail/image',
-    },
-    sortOrder: null,
-    scopeId: null,
+    title: 'Safe to Sleep',
+    description: 'how to safely sleep',
+    sourceUrl: 'src/Assets/videos/S2S_540P.mp4',
+    thumbnailUrl: 'src/Assets/Images/videothumbnail.jpg',
+    points: 100,
+  },
+  {
+    title: 'Breastfeeding',
+    description: 'how to safely sleep',
+    sourceUrl: 'src/Assets/videos/S2S_540P.mp4',
+    thumbnailUrl: 'src/Assets/Images/videothumbnail.jpg',
+    points: 100,
+  },
+  {
+    title: 'Contingency Management',
+    description: 'how to safely sleep',
+    sourceUrl: 'src/Assets/videos/S2S_540P.mp4',
+    thumbnailUrl: 'src/Assets/Images/videothumbnail.jpg',
+    points: 100,
+  },
+  {
+    title: 'Parenting Knowledge/Development Knowledge',
+    description: 'how to safely sleep',
+    sourceUrl: 'src/Assets/videos/S2S_540P.mp4',
+    thumbnailUrl: 'src/Assets/Images/videothumbnail.jpg',
+    points: 100,
+  },
+  {
+    title: 'Self-Compassion',
+    description: 'how to safely sleep',
+    sourceUrl: 'src/Assets/videos/S2S_540P.mp4',
+    thumbnailUrl: 'src/Assets/Images/videothumbnail.jpg',
     points: 100,
   },
 ]

@@ -34,9 +34,44 @@ CREATE TABLE `appuseractivity` (
   `pointsRedeemed` int(20) DEFAULT 0,
   `pointsReceived` int(20) DEFAULT 0,
   `appuserBalancePoints` int(20),
-  `lookupId` int(11),
+  `activityTypeId` int(11),
   PRIMARY KEY (`appuserActivityId`),
-  UNIQUE KEY `appuserActivityId` (`appuserActivityId`),
+  UNIQUE KEY `appuserActivityId` (`appuserActivityId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE `lookup` ADD `points` int(10) DEFAULT NULL;
+DROP TABLE IF EXISTS `videos`;
+
+CREATE TABLE `videos` (
+  `videoId` INT(11) NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `description` VARCHAR(255) NULL DEFAULT NULL,
+  `sourceUrl` VARCHAR(255) NOT NULL,
+  `thumbnailUrl` VARCHAR(255) NOT NULL,
+  `points` int(20) DEFAULT 0,
+  PRIMARY KEY (`videoId`),
+  UNIQUE KEY `videoId` (`videoId`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `quiz`;
+
+CREATE TABLE `quiz` (
+  `quizId` INT(11) NOT NULL AUTO_INCREMENT,
+  `videoId` INT(11) NOT NULL,
+  `points` int(20) DEFAULT 0,
+  PRIMARY KEY (`quizId`),
+  UNIQUE KEY `quizId` (`quizId`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `quizquestions`;
+
+CREATE TABLE `quizquestions` (
+  `quizquestionsId` INT(11) NOT NULL AUTO_INCREMENT,
+  `quizId` INT(11) NOT NULL,
+  `question` VARCHAR(255) NOT NULL,
+  `options` VARCHAR(1000) NOT NULL,
+  `correctAnswerIndex` INT(2) NOT NULL,
+  PRIMARY KEY (`quizquestionsId`),
+  UNIQUE KEY `quizquestionsId` (`quizquestionsId`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+-- ALTER TABLE `lookup` ADD `points` int(10) DEFAULT NULL;

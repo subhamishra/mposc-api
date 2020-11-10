@@ -3,5 +3,5 @@ const quizzData = require('./quizes');
 
 module.exports = [
   educationData,
-  quizzData,
+  // quizzData,
 ]

@@ -1,6 +1,8 @@
 // const addEducationData = require('./education')
 const SeedData = require('./data/index');
 const lookup = require('../../model/lookup');
+const video = require('../../model/videos');
+const educationData = require('./data/educationVideos');
 
 async function insetLookUp(dataToInsert = [], type) {
   // insert MicrolearningEducationVideo LookupType
@@ -48,6 +50,13 @@ async function insetLookUp(dataToInsert = [], type) {
   }
 }
 
+function insertViedos(data) {
+  educationData.Data.forEach(async (data, index) => {
+    await video.createVideo(data);
+  })
+}
+
 SeedData.forEach((data) => {
-  insetLookUp(data.Data, data.LookupType);
+  // insetLookUp(data.Data, data.LookupType);
+  insertViedos(data);
 })
