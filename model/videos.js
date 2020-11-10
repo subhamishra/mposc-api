@@ -20,6 +20,26 @@ function getVideos () {
   })
 }
 
+function getVideoById(id) {
+  const SQL = `SELECT * from videos where videoId = ${id}`;
+  return new Promise((resolve, reject) => {
+    pool.query(SQL, [], (err, result) => {
+      if (err) {
+        console.log(err);
+        resolve({
+          isError: true,
+          err: err,
+        })
+      } else {
+        resolve({
+          isError: false,
+          result: result
+        })
+      }
+    });
+  })
+}
+
 function createVideo(values) {
   const SQL = `INSERT INTO videos
               ( 
@@ -52,7 +72,7 @@ function createVideo(values) {
 }
 
 module.exports = {
-  // getVideoById: getVideoById,
+  getVideoById: getVideoById,
   getVideos: getVideos,
   createVideo: createVideo,
 }

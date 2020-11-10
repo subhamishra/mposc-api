@@ -144,7 +144,7 @@ function addlookup(values) {
         isError: true,
         error: "please enter a valid lookupTypeId",
       })
-    } else if(!displayValue) {
+    } else if (!displayValue) {
       console.error("Please enter a valid display value");
       resolve({
         isError: true,
@@ -168,9 +168,30 @@ function addlookup(values) {
   })
 }
 
+function getLookupById(lookupId) {
+  const SQL = `select * from lookup where lookupId = ${lookupId}`;
+  return new Promise((resolve, reject) => {
+    pool.query(SQL, (err, result) => {
+      if (err) {
+        console.log(err);
+        resolve({
+          isError: true,
+          err: err,
+        })
+      } else {
+        resolve({
+          isError: false,
+          result: result,
+        })
+      }
+    });
+  });
+}
+
 module.exports = {
   lookuptype: lookuptype,
   lookupByTypeId: lookupByTypeId,
+  getLookupById: getLookupById,
   getLookupType: getLookupType,
   addlookupType: addlookupType,
   deleteLookupType: deleteLookupType,
