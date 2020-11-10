@@ -10,6 +10,7 @@ var appointmentRouter = require('./routes/appointment');
 var lookupRouter = require('./routes/lookup');
 var videoRouter = require('./routes/videos');
 var questionRouter = require('./routes/question');
+var appUserActivityRouter = require('./routes/appUserActivity');
 
 var app = express();
 
@@ -36,6 +37,7 @@ app.use('/appointments', appointmentRouter);
 app.use('/lookup', lookupRouter);
 app.use('/videos', videoRouter);
 app.use('/questions', questionRouter);
+app.use('/appUserActivity', appUserActivityRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
