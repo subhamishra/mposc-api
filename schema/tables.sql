@@ -48,25 +48,16 @@ CREATE TABLE `videos` (
   `sourceUrl` VARCHAR(255) NOT NULL,
   `thumbnailUrl` VARCHAR(255) NOT NULL,
   `points` int(20) DEFAULT 0,
+  `quizPoints` int(20) DEFAULT 0,
   PRIMARY KEY (`videoId`),
   UNIQUE KEY `videoId` (`videoId`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `quiz`;
-
-CREATE TABLE `quiz` (
-  `quizId` INT(11) NOT NULL AUTO_INCREMENT,
-  `videoId` INT(11) NOT NULL,
-  `points` int(20) DEFAULT 0,
-  PRIMARY KEY (`quizId`),
-  UNIQUE KEY `quizId` (`quizId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `quizquestions`;
 
 CREATE TABLE `quizquestions` (
   `quizquestionsId` INT(11) NOT NULL AUTO_INCREMENT,
-  `quizId` INT(11) NOT NULL,
+  `videoId` INT(11) NOT NULL,
   `question` VARCHAR(255) NOT NULL,
   `options` VARCHAR(1000) NOT NULL,
   `correctAnswerIndex` INT(2) NOT NULL,

@@ -27,11 +27,12 @@ function createVideo(values) {
                 description,
                 sourceUrl,
                 thumbnailUrl,
-                points
+                points,
+                quizPoints
               ) values
-              (?, ?, ?, ?, ?)`;
-  const { title, description, sourceUrl, thumbnailUrl, points } = values;
-  const updateValues = [title, description, sourceUrl, thumbnailUrl, points];
+              (?, ?, ?, ?, ?, ?)`;
+  const { title, description, sourceUrl, thumbnailUrl, points, quizPoints } = values;
+  const updateValues = [title, description, sourceUrl, thumbnailUrl, points, quizPoints];
   return new Promise((resolve, reject) => {
     pool.query(SQL, updateValues, (err, result) => {
       if (err) {

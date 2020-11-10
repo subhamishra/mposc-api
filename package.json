@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
-    "seed": "nodemon ./helpers/seed/index.js"
+    "seed": "node ./helpers/seed/index.js"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
