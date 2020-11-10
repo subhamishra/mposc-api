@@ -1,6 +1,9 @@
 // const addEducationData = require('./education')
 const SeedData = require('./data/index');
 const lookup = require('../../model/lookup');
+const educationData = require('./data/educationVideos');
+const video = require('../../model/videos');
+const question = require('../../model/question');
 
 async function insetLookUp(dataToInsert = [], type) {
   // insert MicrolearningEducationVideo LookupType
@@ -48,6 +51,21 @@ async function insetLookUp(dataToInsert = [], type) {
   }
 }
 
+function insertViedos(data) {
+  educationData.Data.forEach(async (data, index) => {
+    console.log("inserting video with index: ", index);
+    const videoInsertResp = await video.createVideo(data);
+    if (videoInsertResp.isError){
+      console.log(videoInsertResp);
+    } else {
+      console.log("inserting questions with index: ", index);
+      await question.createBatch(data.children, videoInsertResp.result.insertId);
+      console.log("inserted questions for index: ", index);
+    }
+  })
+}
+
 SeedData.forEach((data) => {
-  insetLookUp(data.Data, data.LookupType);
+  // insetLookUp(data.Data, data.LookupType);
+  insertViedos(data);
 })
