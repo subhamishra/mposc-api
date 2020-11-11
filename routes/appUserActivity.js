@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const addEvent = require('../model/appUserActivity.js').addEvent;
+const appUserActivity = require('../model/appUserActivity.js');
 
 router.post('/', async function (req, res, next) {
-  const data = await addEvent(req.body);
+  const data = await appUserActivity.addActivity(req.body);
   if (data.isError) {
     res.send({
       isError: true,

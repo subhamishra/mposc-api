@@ -33,9 +33,9 @@ function find(column, value) {
 }
 
 function updateAppUser(values) {
-  const { emailAddress, userId } = values;
-  const SQL = `UPDATE appuser SET emailAddress = ? where userId = ${userId}`;
-  const updateValues = [emailAddress];
+  const { emailAddress, userId, points } = values;
+  const SQL = `UPDATE appuser SET emailAddress = ?, points = ? where userId = ${userId}`;
+  const updateValues = [emailAddress, points];
   return new Promise(async (resolve, reject) => {
     pool.query(SQL, updateValues, (err, result) => {
       if (err) {
@@ -47,7 +47,7 @@ function updateAppUser(values) {
       } else {
         resolve({
           isError: false,
-          message: "updated successfully"
+          message: "updated successfully",
         })
       }
     });
@@ -137,4 +137,5 @@ module.exports = {
   find: find,
   getProfile: getProfile,
   updateProfile: updateProfile,
+  updateAppUser: updateAppUser,
 }
