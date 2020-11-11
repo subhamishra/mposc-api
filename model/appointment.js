@@ -78,7 +78,17 @@ async function addEvent(details) {
       );
     }else {
       if(checkUser.caseId){
-        const SQL = `INSERT INTO caseappointment SET createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP, createdByUserId = ${userId}, modifiedByUserId = ${userId}, caseId = ${checkUser.caseId}, appointmentDateTime = ${appointmentDateTime}, appointmentDateTimeEnd = ${appointmentDateTimeEnd} , appointmentTypeId = ${appointmentTypeId} , statusId = ${statusId} , issue = "${issue}" , notes = "${notes}" , duration = "${duration}"`;
+        const SQL = `INSERT INTO caseappointment SET createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
+         createdByUserId = ${userId},
+          modifiedByUserId = ${userId},
+           caseId = ${checkUser.caseId},
+            appointmentDateTime = ${appointmentDateTime},
+             appointmentDateTimeEnd = ${appointmentDateTimeEnd} ,
+              appointmentTypeId = ${appointmentTypeId} ,
+               statusId = ${statusId} ,
+                issue = "${issue}" ,
+                 notes = "${notes}" ,
+                  duration = "${duration}"`;
         return new Promise((resolve, reject) => {
           pool.query(SQL, (err, result) => {
             if (err) {
@@ -109,27 +119,39 @@ async function addEvent(details) {
 }
 
 async function updateEvent(details) {
-  const userId = details.userId;
+  const AppointmentDetails = await getAppointmentDetails(details.appointmentId);
+  function getAppointmentDetails(AppointmentId){
+    const AppointmentDetailsSQL = `select * from caseappointment where appointmentId = ${AppointmentId}`;
+    return new Promise((resolve, reject) => {
+      pool.query(AppointmentDetailsSQL, (err, result) => {
+        if (err) {
+          console.log(err);
+          resolve({
+            isError: true,
+            err: err,
+          })
+        } else {
+          resolve({
+                    result: result[0],
+                  })
+        }
+      });
+  });
+  }
+  const userId = details.userId ?  'modifiedByUserId = ' + details.userId + ' , ' : 'modifiedByUserId = ' + AppointmentDetails.result.modifiedByUserId  + ' , ';
   const DateTime = details.appointmentDateTime;
-  const appointmentDateTime = moment(new Date(DateTime)).valueOf();
-  const appointmentTypeId = details.appointmentTypeId;
+  const appointmentDateTime =DateTime ? 'appointmentDateTime = ' + moment(new Date(DateTime)).valueOf() + ' , ' :'appointmentDateTime = ' + AppointmentDetails.result.appointmentDateTime+ ' , ';
+  const appointmentTypeId = details.appointmentTypeId ? 'appointmentTypeId = ' + details.appointmentTypeId + ' , ' : 'appointmentTypeId = ' + AppointmentDetails.result.appointmentTypeId + ' , ';
   const appointmentId = details.appointmentId;
   const DateTimeEnd = details.appointmentDateTimeEnd;
-  const appointmentDateTimeEnd = moment(new Date(DateTimeEnd)).valueOf();
-  const statusId = details.statusId;
-  const issue = details.issue;
-  const notes = details.notes;
-  const duration = details.duration;
-  if (!userId || !DateTime || !appointmentTypeId || !appointmentId || !DateTimeEnd || !statusId || !duration) {
-    return new Promise((resolve, reject) => {
-        resolve({
-          isError: false,
-          message: "Please enter valid input values, some values are null or appointmentDateTime is not in correct format"
-        })
-      }
-    );
-  } else {
-    const checkUser = await userConform(userId);
+  const appointmentDateTimeEnd = DateTimeEnd ? 'appointmentDateTimeEnd = ' + moment(new Date(DateTimeEnd)).valueOf() + ' , ' : 'appointmentDateTimeEnd = ' +AppointmentDetails.result.appointmentDateTimeEnd + ' , ';
+  const statusId = details.statusId ? 'statusId = ' + details.statusId + ' , ' : 'statusId = ' + AppointmentDetails.result.statusId + ' , ';
+  const issue = details.issue ? 'issue = "' + details.issue + '" , ' : 'issue = "' + AppointmentDetails.result.issue + '" , ';
+  const notes = details.notes ? 'notes = "' + details.notes + '" , ' : 'notes = "' + AppointmentDetails.result.notes + '" , ';
+  const duration = details.duration ? 'duration = "' + details.duration + '", ' : 'duration = "' + AppointmentDetails.result.duration + '", ';
+  const whereParam = ' WHERE appointmentId = ';
+
+    const checkUser = await userConform(details.userId);
     if(!checkUser.result){
       return new Promise((resolve, reject) => {
           resolve({
@@ -140,28 +162,14 @@ async function updateEvent(details) {
       );
     }else{
       if(checkUser.caseId ){
-        const checkAppointmentId = await appointmentIdConform(appointmentId);
-        function appointmentIdConform(userId){
-          const getCaseId_SQL = `select count(*) as checkAppointmentId from caseappointment where appointmentId = ${appointmentId}`;
-          return new Promise((resolve, reject) => {
-            pool.query(getCaseId_SQL,[userId], (err, result) => {
-              if (err) {
-                console.log(err);
-                resolve({
-                  isError: true,
-                  err: err,
-                })
-              } else {
-                resolve({
-                  result: result[0].checkAppointmentId,
-                })
-              }
-            });
-          });
-        }
+        const SQL = 'UPDATE caseappointment SET updatedAt = CURRENT_TIMESTAMP , '+ userId +
+          appointmentDateTime  +
+          appointmentDateTimeEnd +
+          appointmentTypeId +
+          statusId  + issue +
+          notes +
+          duration + ' caseId = ' + checkUser.caseId + whereParam + appointmentId + ';';
 
-        if(checkAppointmentId.result){
-          const SQL = `UPDATE caseappointment SET updatedAt = CURRENT_TIMESTAMP , modifiedByUserId = ${userId} , caseId = ${checkUser.caseId} ,appointmentDateTime = ${appointmentDateTime}  ,  appointmentDateTimeEnd = ${appointmentDateTimeEnd} , appointmentTypeId = ${appointmentTypeId} , statusId = ${statusId} , issue = "${issue}" , notes = "${notes}" , duration = "${duration}" WHERE appointmentId = ${appointmentId}`;
           return new Promise((resolve, reject) => {
             pool.query(SQL, (err, result) => {
               if (err) {
@@ -171,22 +179,21 @@ async function updateEvent(details) {
                   err: err,
                 })
               } else {
-                resolve({
-                  isError: false,
-                  message: "Appointment updated successfully"
-                })
+                if(result.affectedRows > 0){
+          resolve({
+            isError: false,
+            message: "Appointment updated successfully"
+          })
+        }else{
+          resolve({
+            isError: false,
+            message: "AppointmentId does not exists"
+          })
+        }
+
               }
             });
           });
-        }else{
-          return new Promise((resolve, reject) => {
-            resolve({
-              isError: false,
-              message: "AppointmentId does not exists"
-            })
-          });
-        }
-
       }else{
         return new Promise((resolve, reject) => {
           resolve({
@@ -196,7 +203,7 @@ async function updateEvent(details) {
         });
       }
     }
-  }
+  // }
 }
 
 module.exports = {
