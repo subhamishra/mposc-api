@@ -14,4 +14,16 @@ router.post('/', async function (req, res, next) {
   }
 });
 
+router.post('/redeemCart', async function (req, res, next) {
+  const data = await appUserActivity.redeemCart(req.body);
+  if (data.isError) {
+    res.send({
+      isError: true,
+      error: data.err
+    });
+  }else {
+    res.send(data);
+  }
+});
+
 module.exports = router;

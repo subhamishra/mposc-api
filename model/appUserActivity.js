@@ -13,80 +13,77 @@ async function addActivity(details) {
         isError: false,
         message: "required fields userId, scopeId, activityTypeId",
       });
-    }
-    );
+    });
   } else {
-    const details = await elsePart(userId,activityTypeId,scopeId);
-    return new Promise((resolve, reject) => {
-      if(details.isError){
-      resolve({
-        isError: true,
-        message: "cart points cannot exceed the total points",
-      })
-    }else{
+  //   const details = await elsePart(userId,activityTypeId,scopeId);
+  //   return new Promise((resolve, reject) => {
+  //     if(details.isError){
+  //     resolve({
+  //       isError: true,
+  //       message: "cart points cannot exceed the total points",
+  //     })
+  //   }else{
+  //       resolve({
+  //         iserror:false,
+  //         message:'cart redeemed successfull'
+  //       })
+  //   }
+  // });
+    const appUserResult = await AppUser.find("userId", userId);
+    const activityLookup = await Lookup.getLookupById(activityTypeId);
+
+    let appUser = appUserResult.result[0]
+    let totalPoints = appUser.points;
+    let pointsReceived = 0;
+    let pointsRedeemed = 0;
+    if (["VideoPointReceive", "QuizPointReceive"].includes(activityLookup.result[0].displayValue)) {
+      const scopeData = await Video.getVideoById(scopeId);
+      pointsReceived = scopeData.result[0].points;
+      totalPoints += pointsReceived;
+    } else {
+     const caluculatedPoints = await getTotalCartPoints(userId);
+       return new Promise((resolve, reject) => {
+         if(caluculatedPoints.isError){
         resolve({
-          iserror:false,
-          message:'cart redeemed successfull'
+          isError: true,
+          message: "cart points cannot exceed the total points",
         })
+      }
+       });
+      pointsRedeemed = caluculatedPoints.pointsObj.pointsRedeemed;
+      totalPoints = caluculatedPoints.pointsObj.totalPoints;
+      // @todo implement for cart
     }
-  });
 
-
-    // const appUserResult = await AppUser.find("userId", userId);
-    // const activityLookup = await Lookup.getLookupById(activityTypeId);
-    //
-    // let appUser = appUserResult.result[0]
-    // let totalPoints = appUser.points;
-    // let pointsReceived = 0;
-    // let pointsRedeemed = 0;
-    // if (["VideoPointReceive", "QuizPointReceive"].includes(activityLookup.result[0].displayValue)) {
-    //   const scopeData = await Video.getVideoById(scopeId);
-    //   pointsReceived = scopeData.result[0].points;
-    //   totalPoints += pointsReceived;
-    // } else {
-    //  const caluculatedPoints = await getTotalCartPoints(userId);
-    //    return new Promise((resolve, reject) => {
-    //      if(caluculatedPoints.isError){
-    //     resolve({
-    //       isError: true,
-    //       message: "cart points cannot exceed the total points",
-    //     })
-    //   }
-    //    });
-    //   pointsRedeemed = caluculatedPoints.pointsObj.pointsRedeemed;
-    //   totalPoints = caluculatedPoints.pointsObj.totalPoints;
-    //   // @todo implement for cart
-    // }
-    //
-    // const SQL = `INSERT INTO appuseractivity
-    //               SET
-    //               createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
-    //               createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
-    //               pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
-    //               activityTypeId = ${activityTypeId}, scopeId = ${scopeId} `;
-    // return new Promise((resolve, reject) => {
-    //   pool.query(SQL, async (err, result) => {
-    //     if (err) {
-    //       console.log(err);
-    //       resolve({
-    //         isError: true,
-    //         err: err,
-    //       })
-    //     } else {
-    //       appUser.points = totalPoints;
-    //       const updateUserPoints = await AppUser.updateAppUser(appUser);
-    //       if (updateUserPoints.isError) {
-    //         resolve(updateUserPoints);
-    //       } else {
-    //         resolve({
-    //           isError: false,
-    //           message: "AppUserActivity created successfully",
-    //           insertedId: result.insertId,
-    //         })
-    //       }
-    //     }
-    //   });
-    // });
+    const SQL = `INSERT INTO appuseractivity
+                  SET
+                  createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
+                  createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
+                  pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
+                  activityTypeId = ${activityTypeId}, scopeId = ${scopeId} `;
+    return new Promise((resolve, reject) => {
+      pool.query(SQL, async (err, result) => {
+        if (err) {
+          console.log(err);
+          resolve({
+            isError: true,
+            err: err,
+          })
+        } else {
+          appUser.points = totalPoints;
+          const updateUserPoints = await AppUser.updateAppUser(appUser);
+          if (updateUserPoints.isError) {
+            resolve(updateUserPoints);
+          } else {
+            resolve({
+              isError: false,
+              message: "AppUserActivity created successfully",
+              insertedId: result.insertId,
+            })
+          }
+        }
+      });
+    });
   }
 }
 
@@ -105,6 +102,11 @@ async function getTotalCartPoints(userId) {
           err: err,
         })
       } else {
+        resolve({
+                  isError: false,
+                  message: "Succesfully fetched",
+                  cartDetails: result
+                })
 //         var cartPoints = 0;
 //         let pointsRedeemed=0;
 //         let totalPoints=0;
@@ -114,98 +116,128 @@ async function getTotalCartPoints(userId) {
 //   if(cartPoints < result[0].appuserPoints){
 //     pointsRedeemed = cartPoints;
 //     totalPoints = result[0].appuserPoints - cartPoints;
-    resolve({
-      isError: false,
-      message: "Succesfully fetched",
-      cartDetails: result
-    })
-  // }else{
-  //   resolve({
-  //     isError: true,
-  //     message: "Cart points are exceeding more than your total points"
-  //   })
-  // }
+//     resolve({
+//       isError: false,
+//       message: "Succesfully fetched",
+//       pointsObj: {pointsRedeemed, totalPoints}
+//     })
+//   }else{
+//     resolve({
+//       isError: true,
+//       message: "Cart points are exceeding more than your total points"
+//     })
+//   }
 }
 });
 });
 }
 
-async function elsePart(userId,activityTypeId,scopeId){
-const cartItems = await getTotalCartPoints(userId);
-  return new Promise(async (resolve, reject) => {
-    if(cartItems.isError){
+async function redeemCart(details){
+  const { userId, scopeId, activityTypeId } = details;
+  const appUserResult = await AppUser.find("userId", userId);
+  let appUser = appUserResult.result[0];
+  let totalPoints = 0;
+  let pointsRedeemed = 0;
+  let pointsReceived = 0;
+  if (!userId || !scopeId || !activityTypeId) {
+    return new Promise((resolve, reject) => {
       resolve({
-        isError:true,
-        message:'cart value is more than the total points'
-      })
-  }else{
-    const appUserResult = await AppUser.find("userId", userId);
-
-    cartItems.cartDetails.forEach(async(cartItem,index) => {
-
-      let appUser = appUserResult.result[0];
-    let totalPoints = appUser.points;
-    let pointsReceived = 0;
-    let pointsRedeemed = 0;
-    if (["VideoPointReceive", "QuizPointReceive"].includes(cartItem.displayValue)) {
-      const scopeData = await Video.getVideoById(scopeId);
-      pointsReceived = scopeData.result[0].points;
-      totalPoints += pointsReceived;
-    } else {
-      var cartPoints = 0;
-      // let pointsRedeemed=0;
-      // let totalPoints=0;
-      // result.forEach(res => {
-      cartPoints = (cartItem.lookupPoints * cartItem.quantity) + cartPoints;
-      // });
-      return new Promise((resolve, reject) => {
-        if(cartPoints < cartItem.appuserPoints) {
-        pointsRedeemed = cartPoints;
-        totalPoints = cartItem.appuserPoints - cartPoints;
-      }else{
+                isError: false,
+                message: "required fields userId, scopeId, activityTypeId",
+              });
+  });
+  } else {
+    const cartItems = await getTotalCartPoints(userId);
+    if(cartItems.isError){
+      return new Promise((resolve, reject)=>{
         resolve({
-          isError:true,
-          message:"your cart points are more than the total points"
-        })
+            isError: true,
+            message: cartItems.message
+                })
+      });
+    }else{
+      let cartPoints = 0;
+      for(const cartItem of cartItems.cartDetails){
+        cartPoints = (cartItem.lookupPoints * cartItem.quantity) + cartPoints;
+        totalPoints = cartItem.appuserPoints - cartPoints;
+                        if(cartPoints > cartItem.appuserPoints){
+                          return new Promise(async (resolve, reject)=>{
+                            resolve({
+                                      isError: true,
+                                      message: "exceeding your total points"
+                                    })
+                          });
+
+                  }else{
+                          pointsRedeemed = cartPoints;
+                          const insertAppUserActivityDetails = await insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,cartItem.lookupId,scopeId,appUser);
+                          return new Promise((resolve, reject)=>{
+                          if(insertAppUserActivityDetails.isError){
+                              resolve({
+                                        isError:true,
+                                        message:"Issue while inserting the useractivity"
+                                      })
+                          }else{
+                            resolve({
+                              isError:false,
+                              message:"appuseractivity insterted successfully"
+                            })
+                          }
+                        });
+                  }
+
       }
+      // appUser.points = totalPoints;
+      // const updateUserPoints = await AppUser.updateAppUser(appUser);
+      // return new Promise((resolve,reject)=>{
+      //   if (updateUserPoints.isError) {
+      //   resolve(updateUserPoints);
+      // } else {
+      //   resolve({
+      //     isError: false,
+      //     message: "AppUserActivity created successfully"
+      //   })
+      // }
+      // })
+    }
+  }
+}
+
+async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,activityTypeId,scopeId,appUser){
+      const SQL = `INSERT INTO appuseractivity
+                                  SET
+                                  createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
+                                  createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
+                                  pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
+                                  activityTypeId = ${activityTypeId}, scopeId = ${scopeId} `;
+      return new Promise((resolve, reject) => {
+        pool.query(SQL,async ( err, result)=>{
+          if(err){
+            resolve({
+              isError:true,
+              message:err
+            })
+          }else{
+            appUser.points = totalPoints;
+            const updateUserPoints = await AppUser.updateAppUser(appUser);
+            if(updateUserPoints.isError){
+              resolve({
+                isError:true,
+                message:'data insterted successfully'
+              })
+            }else{
+              resolve({
+                isError:false,
+                message:'data insterted successfully'
+              })
+            }
+          }
+        });
     });
     }
 
 
-    const SQL = `INSERT INTO appuseractivity 
-                SET 
-                createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
-                createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
-                pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
-                activityTypeId = ${activityTypeId}, scopeId = ${scopeId},status = ${279} `;
-    return new Promise((resolve, reject) => {
-      pool.query(SQL, async (err, result) => {
-        if (err) {
-          console.log(err);
-          resolve({
-            isError: true,
-            err: err,
-          })
-        } else {
-          appUser.points = totalPoints;
-    const updateUserPoints = await AppUser.updateAppUser(appUser);
-    if (updateUserPoints.isError) {
-      resolve(updateUserPoints);
-    } else {
-      resolve({
-        isError: false,
-        message: "AppUserActivity created successfully",
-        insertedId: result.insertId,
-      })
-    }
-  }
-  });
-  });
-  });
-  }
-  });
-}
-
 module.exports = {
   addActivity: addActivity,
+  redeemCart: redeemCart,
 }
