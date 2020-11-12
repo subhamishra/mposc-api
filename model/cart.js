@@ -69,7 +69,7 @@ function getcart (details) {
 
 
 async function updatecart (details) {
-  const {cartId, lookupId} = details;
+  const {cartId, lookupId, quantity} = details;
   const status = await getStatus(lookupId);
   function getStatus(lookupId){
     const SQL = `select customStringValue from lookup where lookupId = ${lookupId}`;
@@ -90,8 +90,8 @@ async function updatecart (details) {
       });
     })
   }
-  if(status && status.result && status.result[0].customStringValue){
-    const SQL = `UPDATE cart SET status = '${status.result[0].customStringValue}' WHERE cartId = ${cartId}`;
+  // if(status && status.result && status.result[0].customStringValue){
+    const SQL = `UPDATE cart SET quantity = '${quantity}' WHERE cartId = ${cartId}`;
     return new Promise((resolve, reject) => {
       pool.query(SQL, (err, result) => {
         if (err) {
@@ -103,13 +103,12 @@ async function updatecart (details) {
         } else {
           resolve({
             isError: false,
-
             message : "status updated successfully"
           })
         }
       });
     })
-  }
+  // }
 }
 
 module.exports = {
