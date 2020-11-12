@@ -49,16 +49,16 @@ function userConform(userId){
 
 async function addEvent(details) {
   const userId = details.userId ;
-  const DateTime = details.appointmentDateTime;
-  const appointmentDateTime = moment(new Date(DateTime)).valueOf();
+  // const DateTime = details.appointmentDateTime;
+  const appointmentDateTime = details.appointmentDateTime;
   const appointmentTypeId = details.appointmentTypeId;
-  const DateTimeEnd = details.appointmentDateTimeEnd;
-  const appointmentDateTimeEnd = moment(new Date(DateTimeEnd)).valueOf();
+  // const DateTimeEnd = details.appointmentDateTimeEnd;
+  const appointmentDateTimeEnd = details.appointmentDateTimeEnd;
   const statusId = details.statusId;
   const issue = details.issue;
   const notes = details.notes;
   const duration =    details.duration  ;
-  if(!userId || !DateTime || !DateTimeEnd || !appointmentTypeId || !statusId || !duration){
+  if(!userId || !appointmentDateTime || !appointmentDateTimeEnd || !appointmentTypeId || !statusId || !duration){
     return new Promise((resolve, reject) => {
           resolve({
             isError: false,
@@ -139,12 +139,12 @@ async function updateEvent(details) {
   });
   }
   const userId = details.userId ?  'modifiedByUserId = ' + details.userId + ' , ' : 'modifiedByUserId = ' + AppointmentDetails.result.modifiedByUserId  + ' , ';
-  const DateTime = details.appointmentDateTime;
-  const appointmentDateTime =DateTime ? 'appointmentDateTime = ' + moment(new Date(DateTime)).valueOf() + ' , ' :'appointmentDateTime = ' + AppointmentDetails.result.appointmentDateTime+ ' , ';
+  // const DateTime = details.appointmentDateTime;
+  const appointmentDateTime =details.appointmentDateTime ? 'appointmentDateTime = ' + details.appointmentDateTime + ' , ' :'appointmentDateTime = ' + AppointmentDetails.result.appointmentDateTime+ ' , ';
   const appointmentTypeId = details.appointmentTypeId ? 'appointmentTypeId = ' + details.appointmentTypeId + ' , ' : 'appointmentTypeId = ' + AppointmentDetails.result.appointmentTypeId + ' , ';
   const appointmentId = details.appointmentId;
   const DateTimeEnd = details.appointmentDateTimeEnd;
-  const appointmentDateTimeEnd = DateTimeEnd ? 'appointmentDateTimeEnd = ' + moment(new Date(DateTimeEnd)).valueOf() + ' , ' : 'appointmentDateTimeEnd = ' +AppointmentDetails.result.appointmentDateTimeEnd + ' , ';
+  const appointmentDateTimeEnd = details.appointmentDateTimeEnd ? 'appointmentDateTimeEnd = ' + details.appointmentDateTimeEnd + ' , ' : 'appointmentDateTimeEnd = ' +AppointmentDetails.result.appointmentDateTimeEnd + ' , ';
   const statusId = details.statusId ? 'statusId = ' + details.statusId + ' , ' : 'statusId = ' + AppointmentDetails.result.statusId + ' , ';
   const issue = details.issue ? 'issue = "' + details.issue + '" , ' : 'issue = "' + AppointmentDetails.result.issue + '" , ';
   const notes = details.notes ? 'notes = "' + details.notes + '" , ' : 'notes = "' + AppointmentDetails.result.notes + '" , ';
