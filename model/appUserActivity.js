@@ -136,6 +136,7 @@ async function redeemCart(details){
   const { userId, scopeId, activityTypeId } = details;
   const appUserResult = await AppUser.find("userId", userId);
   let appUser = appUserResult.result[0];
+  let lookupId = '';
   let totalPoints = 0;
   let pointsRedeemed = 0;
   let pointsReceived = 0;
@@ -153,13 +154,15 @@ async function redeemCart(details){
         resolve({
             isError: true,
             message: cartItems.message
-                })
+                });
       });
     }else{
       let cartPoints = 0;
       for(const cartItem of cartItems.cartDetails){
         cartPoints = (cartItem.lookupPoints * cartItem.quantity) + cartPoints;
         totalPoints = cartItem.appuserPoints - cartPoints;
+        lookupId = cartItem.lookupId;
+        console.log(cartItem.lookupId);
                         if(cartPoints > cartItem.appuserPoints){
                           return new Promise(async (resolve, reject)=>{
                             resolve({
@@ -170,23 +173,25 @@ async function redeemCart(details){
 
                   }else{
                           pointsRedeemed = cartPoints;
-                          const insertAppUserActivityDetails = await insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,cartItem.lookupId,scopeId,appUser);
-                          return new Promise((resolve, reject)=>{
+                          const insertAppUserActivityDetails = await insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,lookupId,scopeId,appUser);
                           if(insertAppUserActivityDetails.isError){
+                            return new Promise((resolve, reject)=>{
                               resolve({
                                         isError:true,
                                         message:"Issue while inserting the useractivity"
                                       })
-                          }else{
-                            resolve({
-                              isError:false,
-                              message:"appuseractivity insterted successfully"
-                            })
+                            });
                           }
-                        });
                   }
 
       }
+      return new Promise((resolve, reject)=>{
+        resolve({
+                  isError:false,
+                  message:"success",
+                  message:"successfull created"
+                })
+      });
       // appUser.points = totalPoints;
       // const updateUserPoints = await AppUser.updateAppUser(appUser);
       // return new Promise((resolve,reject)=>{
@@ -203,13 +208,13 @@ async function redeemCart(details){
   }
 }
 
-async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,activityTypeId,scopeId,appUser){
+async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,activityTypeIds,scopeId,appUser){
       const SQL = `INSERT INTO appuseractivity
                                   SET
                                   createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
                                   createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
                                   pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
-                                  activityTypeId = ${activityTypeId}, scopeId = ${scopeId} `;
+                                  activityTypeId = ${activityTypeIds}, scopeId = ${scopeId} `;
       return new Promise((resolve, reject) => {
         pool.query(SQL,async ( err, result)=>{
           if(err){
