@@ -34,7 +34,8 @@ CREATE TABLE `appuseractivity` (
   `pointsRedeemed` int(20) DEFAULT 0,
   `pointsReceived` int(20) DEFAULT 0,
   `appuserBalancePoints` int(20),
-  `activityTypeId` int(11),
+  `scopeId` int(11) DEFAULT NULL,
+  `activityTypeId` int(11) NOT NULL, -- it is the lookup id for ActivityType lookup type
   PRIMARY KEY (`appuserActivityId`),
   UNIQUE KEY `appuserActivityId` (`appuserActivityId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
@@ -64,5 +65,21 @@ CREATE TABLE `quizquestions` (
   PRIMARY KEY (`quizquestionsId`),
   UNIQUE KEY `quizquestionsId` (`quizquestionsId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `cart`;
+/*!40101 SET @saved_cs_client = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cart` (
+`cartId` int NOT NULL AUTO_INCREMENT,
+`userId` int DEFAULT NULL,
+`lookupId` int DEFAULT NULL,
+`iswishlist` tinyint DEFAULT NULL,
+`quantity` int DEFAULT NULL,
+`status` int(11) DEFAULT NULL,
+PRIMARY KEY (`cartId`),
+UNIQUE KEY `cartId_UNIQUE` (`cartId`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 -- ALTER TABLE `lookup` ADD `points` int(10) DEFAULT NULL;
