@@ -5,7 +5,7 @@ async function addcart (details) {
 
     const doesExist = await checkDoesExist(userId,lookupId);
     function checkDoesExist(userId,lookupId){
-      const SQL = `select * from cart where userId = ${userId} AND lookupId = ${lookupId} AND iswishlist = ${iswishlist}`;
+      const SQL = `select * from cart where userId = ${userId} AND lookupId = ${lookupId} AND iswishlist =${iswishlist}`;
       return new Promise((resolve, reject) => {
         pool.query(SQL, (err, result) => {
           if (err) {
@@ -24,7 +24,8 @@ async function addcart (details) {
       })
     }
      if(doesExist.result.length){
-       const SQL = `UPDATE cart set quantity = ${quantity} where userId = ${userId} and lookupId = ${lookupId} and iswishlist = ${iswishlist}`;
+       const addQuantity = Number(doesExist.result[0].quantity)  + Number(quantity)  ;
+       const SQL = `UPDATE cart set quantity = ${addQuantity} where userId = ${userId} and lookupId = ${lookupId} and iswishlist = ${iswishlist}`;
        return new Promise((resolve, reject) => {
          pool.query(SQL, (err, result) => {
            if (err) {
@@ -36,7 +37,7 @@ async function addcart (details) {
            } else {
              resolve({
                isError: false,
-               message : "item added to cart successfully"
+               message : "item quantity added to cart successfully"
              })
            }
          });
