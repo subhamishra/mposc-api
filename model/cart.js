@@ -3,46 +3,64 @@ const pool = require("../config/db.js");
 async function addcart (details) {
   const {userId, lookupId, iswishlist,quantity,status} = details;
 
-  if(iswishlist==="true"|| iswishlist ===1){
-    const SQL = `insert into cart set userId = ${userId}, lookupId = ${lookupId}, iswishlist = ${iswishlist} ,quantity = 1,status=${status}`;
-    return new Promise((resolve, reject) => {
-      pool.query(SQL, (err, result) => {
-        if (err) {
-          console.log(err);
-          resolve({
-            isError: true,
-            err: err,
-          })
-        } else {
-          resolve({
-            isError: false,
-            insertId: result.insertId,
-            message : "item added to wishlist successfully"
-          })
-        }
-      });
-    })
-  }else {
-    const SQL = `insert into cart set userId = ${userId}, lookupId = ${lookupId}, iswishlist = ${iswishlist} ,quantity = ${quantity},status=${status}`;
-    return new Promise((resolve, reject) => {
-      pool.query(SQL, (err, result) => {
-        if (err) {
-          console.log(err);
-          resolve({
-            isError: true,
-            err: err,
-          })
-        } else {
-          resolve({
-            isError: false,
-            insertId: result.insertId,
-            message : "item added to cart successfully"
-          })
-        }
-      });
-    })
-  }
-
+    const doesExist = await checkDoesExist(userId,lookupId);
+    function checkDoesExist(userId,lookupId){
+      const SQL = `select * from cart where userId = ${userId} AND lookupId = ${lookupId} AND iswishlist = ${iswishlist}`;
+      return new Promise((resolve, reject) => {
+        pool.query(SQL, (err, result) => {
+          if (err) {
+            console.log(err);
+            resolve({
+              isError: true,
+              err: err,
+            })
+          } else {
+            resolve({
+              isError: false,
+              result: result
+            })
+          }
+        });
+      })
+    }
+     if(doesExist.result.length){
+       const SQL = `UPDATE cart set quantity = ${quantity} where userId = ${userId} and lookupId = ${lookupId} and iswishlist = ${iswishlist}`;
+       return new Promise((resolve, reject) => {
+         pool.query(SQL, (err, result) => {
+           if (err) {
+             console.log(err);
+             resolve({
+               isError: true,
+               err: err,
+             })
+           } else {
+             resolve({
+               isError: false,
+               message : "item added to cart successfully"
+             })
+           }
+         });
+       })
+     }else {
+       const SQL = `insert into cart set userId = ${userId}, lookupId = ${lookupId}, iswishlist = ${iswishlist} ,quantity = ${quantity},status=${status}`;
+       return new Promise((resolve, reject) => {
+         pool.query(SQL, (err, result) => {
+           if (err) {
+             console.log(err);
+             resolve({
+               isError: true,
+               err: err,
+             })
+           } else {
+             resolve({
+               isError: false,
+               insertId: result.insertId,
+               message : "item added to cart successfully"
+             })
+           }
+         });
+       })
+     }
 
 }
 
