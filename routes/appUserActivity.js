@@ -26,4 +26,13 @@ router.post('/redeemCart', async function (req, res, next) {
   }
 });
 
+router.get('/reportByActivityType', async function (req, res, next) {
+  const data = await appUserActivity.reportByActivityType(req.query.userId);
+  if (data.isError) {
+    res.send(data);
+  }else {
+    res.send(data);
+  }
+});
+
 module.exports = router;

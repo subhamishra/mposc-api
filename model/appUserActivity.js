@@ -36,7 +36,7 @@ async function addActivity(details) {
     let totalPoints = appUser.points;
     let pointsReceived = 0;
     let pointsRedeemed = 0;
-    if (["VideoPointReceive", "QuizPointReceive"].includes(activityLookup.result[0].displayValue)) {
+    if (["VideoPointReceive", "QuizPointReceive", "Therapy"].includes(activityLookup.result[0].displayValue)) {
       const scopeData = await Video.getVideoById(scopeId);
       pointsReceived = scopeData.result[0].points;
       totalPoints += pointsReceived;
@@ -140,11 +140,11 @@ async function redeemCart(details){
   let totalPoints = 0;
   let pointsRedeemed = 0;
   let pointsReceived = 0;
-  if (!userId || !scopeId || !activityTypeId) {
+  if (!userId) {
     return new Promise((resolve, reject) => {
       resolve({
                 isError: false,
-                message: "required fields userId, scopeId, activityTypeId",
+                message: "required fields userId",
               });
   });
   } else {
@@ -241,8 +241,32 @@ async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalP
     });
     }
 
+function reportByActivityType(userId) {
+  const SQL = `select l.lookupTypeId, l.lookupId, l.displayValue, sumByType.pointsReceived from lookup l
+  left join
+  (SELECT activityTypeId, sum(pointsReceived) as pointsReceived FROM cms_dev_cart.appuseractivity where appUserId = ${userId} group by activityTypeId) as sumByType on sumByType.activityTypeId = l.lookupId
+  where sumByType.pointsReceived is not null
+  `;
+  return new Promise((resolve, reject) => {
+    pool.query(SQL, (err, result) => {
+      if (err) {
+        console.log(err);
+        resolve({
+          isError: true,
+          error: err,
+        })
+      } else {
+        resolve({
+          isError: false,
+          result: result,
+        })
+      }
+    });
+  })
+}
 
 module.exports = {
   addActivity: addActivity,
   redeemCart: redeemCart,
+  reportByActivityType: reportByActivityType,
 }
