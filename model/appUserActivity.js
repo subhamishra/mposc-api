@@ -242,9 +242,9 @@ async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalP
     }
 
 function reportByActivityType(userId) {
-  const SQL = `select l.lookupTypeId, l.lookupId, l.displayValue, sumByType.pointsReceived from lookup l
+  const SQL = `select l.lookupTypeId, l.lookupId, l.displayValue, sumByType.pointsReceived, sumByType.createdAt from lookup l
   left join
-  (SELECT activityTypeId, sum(pointsReceived) as pointsReceived FROM cms_dev_cart.appuseractivity where appUserId = ${userId} group by activityTypeId) as sumByType on sumByType.activityTypeId = l.lookupId
+  (SELECT activityTypeId, createdAt, sum(pointsReceived) as pointsReceived FROM appuseractivity where appUserId = ${userId} group by activityTypeId) as sumByType on sumByType.activityTypeId = l.lookupId
   where sumByType.pointsReceived is not null
   `;
   return new Promise((resolve, reject) => {
