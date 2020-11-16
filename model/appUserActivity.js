@@ -133,7 +133,7 @@ async function getTotalCartPoints(userId) {
 }
 
 async function redeemCart(details){
-  const { userId, scopeId, activityTypeId } = details;
+  const { userId } = details;
   const appUserResult = await AppUser.find("userId", userId);
   let appUser = appUserResult.result[0];
   let lookupId = '';
@@ -173,7 +173,7 @@ async function redeemCart(details){
 
                   }else{
                           pointsRedeemed = cartPoints;
-                          const insertAppUserActivityDetails = await insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,lookupId,scopeId,appUser);
+                          const insertAppUserActivityDetails = await insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,lookupId,appUser);
                           if(insertAppUserActivityDetails.isError){
                             return new Promise((resolve, reject)=>{
                               resolve({
@@ -208,13 +208,13 @@ async function redeemCart(details){
   }
 }
 
-async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,activityTypeIds,scopeId,appUser){
+async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,activityTypeIds,appUser){
       const SQL = `INSERT INTO appuseractivity
                                   SET
                                   createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
                                   createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
                                   pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
-                                  activityTypeId = ${activityTypeIds}, scopeId = ${scopeId} `;
+                                  activityTypeId = ${activityTypeIds}`;
       return new Promise((resolve, reject) => {
         pool.query(SQL,async ( err, result)=>{
           if(err){
