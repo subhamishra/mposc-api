@@ -3,6 +3,7 @@ const AppUser = require('./appUser');
 const Lookup = require('./lookup');
 const Video = require('./videos');
 const Cart = require('./cart');
+const moment = require("moment")
 
 async function addActivity(details) {
   const { userId, scopeId, activityTypeId } = details;
@@ -54,10 +55,11 @@ async function addActivity(details) {
       totalPoints = caluculatedPoints.pointsObj.totalPoints;
       // @todo implement for cart
     }
-
+    var createdAt =moment(new Date()).valueOf();
+    var updatedAt =moment(new Date()).valueOf();
     const SQL = `INSERT INTO appuseractivity
                   SET
-                  createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
+                  createdAt = ${createdAt}, updatedAt = ${updatedAt},
                   createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
                   pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
                   activityTypeId = ${activityTypeId}, scopeId = ${scopeId} `;
@@ -209,9 +211,11 @@ async function redeemCart(details){
 }
 
 async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,activityTypeIds,appUser){
+    var createdAt =moment(new Date()).valueOf();
+    var updatedAt =moment(new Date()).valueOf();
       const SQL = `INSERT INTO appuseractivity
                                   SET
-                                  createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
+                                  createdAt = ${createdAt}, updatedAt = ${updatedAt},
                                   createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
                                   pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
                                   activityTypeId = ${activityTypeIds}`;
