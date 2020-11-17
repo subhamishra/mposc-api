@@ -1,26 +1,26 @@
-const Data = [
-  {
-    displayValue: 'Quiz',
-    customValue: null,
-    customStringValue: null,
-    sortOrder: null,
-    scopeId: null,
-  },
-  {
-    displayValue: 'Video',
-    customValue: null,
-    customStringValue: null,
-    sortOrder: null,
-    scopeId: null,
-  },
-  {
-    displayValue: 'Cart',
-    customValue: null,
-    customStringValue: null,
-    sortOrder: null,
-    scopeId: null,
-  },
-]
+// const Data = [
+//   {
+//     displayValue: 'Quiz',
+//     customValue: null,
+//     customStringValue: null,
+//     sortOrder: null,
+//     scopeId: null,
+//   },
+//   {
+//     displayValue: 'Video',
+//     customValue: null,
+//     customStringValue: null,
+//     sortOrder: null,
+//     scopeId: null,
+//   },
+//   {
+//     displayValue: 'Cart',
+//     customValue: null,
+//     customStringValue: null,
+//     sortOrder: null,
+//     scopeId: null,
+//   },
+// ]
 
 const ItemsData = {
   lookupType: {
@@ -274,12 +274,40 @@ const ItemsData = {
   ]
 }
 
-const LookupType = {
-  lookupType: "AppUserActivityType",
-  description: "This is used for app user activity. e.g. redeeming points, receiving points",
+const CartStatus = {
+  lookupType: {
+    lookupType: "CartStatus",
+    description: "This is used for setting the cart status",
+  },
+  lookups: [
+    {
+      displayValue: "InCart",
+      customValue: null,
+      customStringValue: null,
+      points: null,
+    },
+    {
+      displayValue: "Redeemed",
+      customValue: null,
+      customStringValue: null,
+      points: null,
+
+    },
+    {
+      displayValue: "Deleted",
+      customValue: null,
+      customStringValue: null,
+      points: null,
+    },
+  ]
 }
 
-module.exports = {
-  Data: Data,
-  LookupType: LookupType,
-}
+// const LookupType = {
+//   lookupType: "AppUserActivityType",
+//   description: "This is used for app user activity. e.g. redeeming points, receiving points",
+// }
+
+module.exports = [
+  ItemsData,
+  CartStatus,
+]
