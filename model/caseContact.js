@@ -5,9 +5,9 @@ async function addCaseContact(params){
     var createdAt =moment(new Date()).valueOf();
     var updatedAt =moment(new Date()).valueOf();
     const isDeleted = 0;
-    const SQL = `insert into casecontact set fullName = ${params.name}, cellNumber = ${params.phoneNumber},
+    const SQL = `insert into casecontact set fullName = '${params.name}', cellNumber = '${params.phoneNumber}',
 createdAt = ${createdAt}, updatedAt = ${updatedAt} ,createdByUserId = ${params.userId}, modifiedByUserId = ${params.userId},isDeleted = ${isDeleted} ,
-caseId = (select caseId from appuser where userId = ${userId} ), contactTypeId = ${params.contactTypeId}, email = ${params.email};
+caseId = (select caseId from appuser where userId = ${params.userId} ), contactTypeId = ${params.contactTypeId}, email = '${params.email}', organisation = '${params.organisation}';
 `;
 
     return new Promise((resolve,reject)=>{
@@ -50,9 +50,10 @@ async function updateCaseContact(params){
                 const phoneNumber = params.phoneNumber ? params.phoneNumber : result[0].cellNumber;
                 const contactTypeId = params.contactTypeId ? params.contactTypeId : result[0].contactTypeId;
                 const modifiedUserId = params.userId;
+                const organisation = params.organisation ? params.organisation : result[0].organisation;
                 const updateSQL = `UPDATE casecontact SET fullName = '${fullName}', cellNumber = '${phoneNumber}',
                  updatedAt = ${updatedAt} , modifiedByUserId = ${modifiedUserId},
-                 contactTypeId = ${contactTypeId}, email = '${email}'  where caseContactId = ${params.caseContactId}`;
+                 contactTypeId = ${contactTypeId}, email = '${email}',organisation = ${organisation}  where caseContactId = ${params.caseContactId}`;
                     pool.query(updateSQL, (err, updateDetails)=>{
                         if(err){
                             resolve({
