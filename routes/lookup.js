@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const lookup = require('../model/lookup.js')
-
+const lookupfile = require('../helpers/seed/data/lookup').ItemsData
+const  insertlookupfile = require('../helpers/seed/insertLookupData')
 router.get('/types', async function (req, res, next) {
   const data = await lookup.lookuptype('');
   if (data.isError) {
@@ -52,6 +53,10 @@ router.post('/deleteType', async function (req, res, next) {
       message: "successfully deleted lookup type"
     });
   }
+});
+
+router.post('/addData', async function (req, res, next) {
+   await insertlookupfile.insertLookUp();
 });
 
 module.exports = router;
