@@ -29,4 +29,13 @@ router.post('/update', async function (req, res) {
   }
 })
 
+router.post('/deleteItem', async function (req, res) {
+  const data = await cart.deleteItemInCartOrWishList(req.body);
+  if (data.isError) {
+    res.send(data);
+  } else {
+    res.send(data);
+  }
+})
+
 module.exports = router;

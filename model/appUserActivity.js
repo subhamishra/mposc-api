@@ -3,7 +3,7 @@ const AppUser = require('./appUser');
 const Lookup = require('./lookup');
 const Video = require('./videos');
 const Cart = require('./cart');
-const moment = require("moment")
+const moment = require("moment");
 
 async function addActivity(details) {
   const { userId, scopeId, activityTypeId } = details;
@@ -37,7 +37,7 @@ async function addActivity(details) {
     let totalPoints = appUser.points;
     let pointsReceived = 0;
     let pointsRedeemed = 0;
-    if (["VideoPointReceive", "QuizPointReceive", "Therapy"].includes(activityLookup.result[0].displayValue)) {
+    if (["VideoPointReceive", "QuizPointReceive", "Therapy", "Center Program"].includes(activityLookup.result[0].displayValue)) {
       const scopeData = await Video.getVideoById(scopeId);
       pointsReceived = scopeData.result[0].points;
       totalPoints += pointsReceived;
