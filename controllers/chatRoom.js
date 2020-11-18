@@ -36,7 +36,7 @@ module.exports = {
 
       const currentLoggedUser = req.body.userId;
       const post = await ChatMessageModel.createPostInChatRoom(roomId, req.body.messageText, currentLoggedUser);
-      // global.io.sockets.in(roomId).emit('new message', { message: post });
+      global.io.sockets.in(roomId).emit('new message', { message: post });
       return res.status(200).send({ isError: false, post });
     } catch (error) {
       return res.status(500).send({ success: false, error: error })
