@@ -68,7 +68,7 @@ async function addcart (details) {
 function getcart (details) {
   const {userId, iswishlist} = details;
   const status = 281;
-  const SQL = `select * from cart where userId = ${userId} and iswishlist = ${iswishlist} and status = ${status}`;
+  const SQL = `select * from cart where userId = ${userId} and iswishlist = ${iswishlist}`;
   return new Promise((resolve, reject) => {
     pool.query(SQL, (err, result) => {
       if (err) {
