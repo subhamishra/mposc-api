@@ -23,7 +23,7 @@ async function getChatRoomsByUserId(userId) {
 }
 
 async function getChatRoomByRoomId(roomId) {
-  const SQL = `SELECT cm.chatRoomId, cm.message, cm.postedByUser, cm.readByUser, cr.userIds, cm.createdAt, cm.updatedAt FROM cms_dev_new.chatmessages cm inner join cms_dev_new.chatrooms cr on cm.chatRoomId = cr.id where cr.id = ${roomId} order by cm.createdAt desc`;
+  const SQL = `SELECT cm.chatRoomId, cm.message, cm.postedByUser, cm.readByUser, cr.userIds, cm.createdAt, cm.updatedAt FROM chatmessages cm inner join chatrooms cr on cm.chatRoomId = cr.id where cr.id = ${roomId} order by cm.createdAt desc`;
   return new Promise((resolve, reject) => {
     pool.query(SQL, [], (err, result) => {
       if (err) {

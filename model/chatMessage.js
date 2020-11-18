@@ -55,7 +55,7 @@ async function getConversationByRoomId(chatRoomId, options = {}) {
 
 async function markMessageRead(chatRoomId, currentUserOnlineId) {
   try {
-    const SQL = `UPDATE chatmessages SET readByUser = '${currentUserOnlineId}' WHERE chatRoomId = ${chatRoomId} AND postedByUser != ${chatRoomId}`;
+    const SQL = `UPDATE chatmessages SET readByUser = '${currentUserOnlineId}' WHERE chatRoomId = ${chatRoomId} AND postedByUser != ${currentUserOnlineId}`;
     return new Promise((resolve, reject) => {
       pool.query(SQL, (err, result) => {
         if (err) {
