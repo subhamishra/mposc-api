@@ -57,7 +57,8 @@ async function addEvent(details) {
   const statusId = details.statusId;
   const issue = details.issue;
   const notes = details.notes;
-  const duration =    details.duration  ;
+  const duration =    details.duration;
+  const caseContactId = details.caseContactId;
   if(!userId || !appointmentDateTime || !appointmentDateTimeEnd || !appointmentTypeId || !statusId || !duration){
     return new Promise((resolve, reject) => {
           resolve({
@@ -83,12 +84,12 @@ async function addEvent(details) {
           modifiedByUserId = ${userId},
            caseId = ${checkUser.caseId},
             appointmentDateTime = ${appointmentDateTime},
-             appointmentDateTimeEnd = ${appointmentDateTimeEnd} ,
+             appointmentDateTimeEnd = ${appointmentDateTimeEnd} , 
               appointmentTypeId = ${appointmentTypeId} ,
                statusId = ${statusId} ,
                 issue = "${issue}" ,
                  notes = "${notes}" ,
-                  duration = "${duration}"`;
+                  duration = "${duration}", caseContactId = ${caseContactId}`;
         return new Promise((resolve, reject) => {
           pool.query(SQL, (err, result) => {
             if (err) {
@@ -150,6 +151,7 @@ async function updateEvent(details) {
   const notes = details.notes ? 'notes = "' + details.notes + '" , ' : 'notes = "' + AppointmentDetails.result.notes + '" , ';
   const duration = details.duration ? 'duration = "' + details.duration + '", ' : 'duration = "' + AppointmentDetails.result.duration + '", ';
   const whereParam = ' WHERE appointmentId = ';
+  const caseContactId = details.caseContactId ? ' caseContactId = ' + details.caseContactId + ' , ': ' caseContactId = ' + AppointmentDetails.result.caseContactId + ' , ';
 
     const checkUser = await userConform(details.userId);
     if(!checkUser.result){
@@ -168,7 +170,7 @@ async function updateEvent(details) {
           appointmentTypeId +
           statusId  + issue +
           notes +
-          duration + ' caseId = ' + checkUser.caseId + whereParam + appointmentId + ';';
+          duration + caseContactId + ' caseId = ' + checkUser.caseId + whereParam + appointmentId + ';';
 
           return new Promise((resolve, reject) => {
             pool.query(SQL, (err, result) => {

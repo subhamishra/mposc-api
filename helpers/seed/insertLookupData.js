@@ -1,52 +1,51 @@
-const educationData = require('./data/educationVideos');
-
+const filedata = require('./data/lookup')
 const lookup = require('../../model/lookup');
 
+async function insertLookUp() {
+  filedata.forEach((item) => {
+    insertLookupItems(item)
+  })
+}
 
-async function insetLookUp(dataToInsert = [], type) {
-  // insert MicrolearningEducationVideo LookupType
-  const lookupType = await lookup.getLookupType(null, type || '');
-  if (lookupType.isError || lookupType.result.length > 0) {
-    const data = {
-      isError: true,
-      message: `lookupType ${type} already exist or there is some error from mysql`,
-      error: lookupType.error,
-    }
+async function insertLookupItems(item) {
+  let lookupTypeName = item.lookupType.lookupType
+  const {lookups, lookupType } = item
+  //checking whether lookupType already exist in database
+  const existResponse = await lookup.getLookupType(null, lookupTypeName || '');
+  if (existResponse.isError || existResponse.result.length > 0) {
+    console.log(`lookupType ${lookupTypeName} already exist or there is some error from mysql`);
+    // const data = {
+    //   isError: true,
+    //   message: `lookupType ${type} already exist or there is some error from mysql`,
+    //   error: lookupTypeRes.error,
+    // }
   }
 
   let lookupTypeId;
-    
-  if (lookupType.result.length > 0) {
-    console.log(`lookupType ${type} already exist`);
-    lookupTypeId = lookupType.result[0].lookupTypeId;
+//getting lookupId
+  if (existResponse.result.length > 0) {
+    console.log(`lookupType ${lookupTypeName} already exist`);
+    lookupTypeId = existResponse.result[0].lookupTypeId;
   } else {
-    const lookupTypeResponse = await lookup.addlookupType({
-      lookupType: 'MicrolearningEducationVideo',
-      description: "Videos for microlearning education provided in Education screen in mobile app",
-    });
-    lookupTypeId = lookupTypeResponse.insertId;
+    const createdResponse = await lookup.addlookupType( lookupType);
+    lookupTypeId = createdResponse.result.insertId;
   }
 
   if (!lookupTypeId) {
     console.error('lookupTypeId could not be found');
   } else {
-    // insert MicrolearningEducationVideos in lookup table
-    dataToInsert.map(async (video, index) => {
-      console.log("inserting video index: ", index)
-      const lookupResp = await lookup.addlookup({ ...video, lookupTypeId: lookupTypeId, });
+    //adding lookup items to database
+    lookups.map(async (data, index) => {
+      console.log("inserting data index: ", index)
+      const lookupResp = await lookup.addlookup({ ...data, lookupTypeId: lookupTypeId, });
       if (lookupResp.isError) {
         console.error(lookupResp.error);
       } else {
-        console.log("Inserted video with id: ", lookupResp.result.insertId);
-        if(video.children) {
-          const {childData, childLookup} = video.children;
-          if (childLookup && childData) {
-            insetLookUp(childData, childLookup)
-          }
-        }
+        console.log("Inserted data with id: ", lookupResp.result.insertId);
       }
     });
   }
 }
-
-module.exports = educationSetup
+module.exports = {
+  insertLookUp:insertLookUp
+}

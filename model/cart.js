@@ -5,7 +5,7 @@ async function addcart (details) {
 
     const doesExist = await checkDoesExist(userId,lookupId);
     function checkDoesExist(userId,lookupId){
-      const SQL = `select * from cart where userId = ${userId} AND lookupId = ${lookupId} AND iswishlist =${iswishlist}`;
+      const SQL = `select * from cart where userId = ${userId} AND lookupId = ${lookupId} AND iswishlist =${iswishlist} AND status != ${status}`;
       return new Promise((resolve, reject) => {
         pool.query(SQL, (err, result) => {
           if (err) {
@@ -67,6 +67,7 @@ async function addcart (details) {
 
 function getcart (details) {
   const {userId, iswishlist} = details;
+  const status = 281;
   const SQL = `select * from cart where userId = ${userId} and iswishlist = ${iswishlist}`;
   return new Promise((resolve, reject) => {
     pool.query(SQL, (err, result) => {
@@ -130,8 +131,31 @@ async function updatecart (details) {
   // }
 }
 
+async function deleteItemInCartOrWishList(params){
+  const statusIdItemDeleted = 281;
+    const SQL = `update cart set quantity = ${params.quantity}, status = ${statusIdItemDeleted} where cartId = ${params.cartId} and lookupId = ${params.lookupId};`
+  return new Promise((resolve,reject)=>{
+    pool.query(SQL,(err,result)=>{
+      if(err){
+        resolve({
+          isError:true,
+          err: err
+        })
+      }else{
+        resolve({
+                  isError: false,
+                  message: result
+                });
+      }
+    })
+  });
+
+
+}
+
 module.exports = {
   addcart: addcart,
   getcart:getcart,
-  updatecart:updatecart
+  updatecart:updatecart,
+  deleteItemInCartOrWishList:deleteItemInCartOrWishList
 }

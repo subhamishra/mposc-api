@@ -13,6 +13,7 @@ var questionRouter = require('./routes/question');
 var appUserActivityRouter = require('./routes/appUserActivity');
 var cartRouter = require('./routes/cart');
 var chatRoomRouter = require('./routes/chatRoom');
+var contactRouter = require('./routes/caseContact');
 
 var app = express();
 
@@ -42,6 +43,7 @@ app.use('/questions', questionRouter);
 app.use('/appUserActivity', appUserActivityRouter);
 app.use('/cart', cartRouter);
 app.use('/chat', chatRoomRouter);
+app.use('/contact', contactRouter);
 
 
 // catch 404 and forward to error handler

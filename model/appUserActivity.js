@@ -3,6 +3,7 @@ const AppUser = require('./appUser');
 const Lookup = require('./lookup');
 const Video = require('./videos');
 const Cart = require('./cart');
+const moment = require("moment");
 
 async function addActivity(details) {
   const { userId, scopeId, activityTypeId } = details;
@@ -36,7 +37,7 @@ async function addActivity(details) {
     let totalPoints = appUser.points;
     let pointsReceived = 0;
     let pointsRedeemed = 0;
-    if (["VideoPointReceive", "QuizPointReceive", "Therapy"].includes(activityLookup.result[0].displayValue)) {
+    if (["VideoPointReceive", "QuizPointReceive", "Therapy", "Center Program"].includes(activityLookup.result[0].displayValue)) {
       const scopeData = await Video.getVideoById(scopeId);
       pointsReceived = scopeData.result[0].points;
       totalPoints += pointsReceived;
@@ -54,10 +55,11 @@ async function addActivity(details) {
       totalPoints = caluculatedPoints.pointsObj.totalPoints;
       // @todo implement for cart
     }
-
+    var createdAt =moment(new Date()).valueOf();
+    var updatedAt =moment(new Date()).valueOf();
     const SQL = `INSERT INTO appuseractivity
                   SET
-                  createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
+                  createdAt = ${createdAt}, updatedAt = ${updatedAt},
                   createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
                   pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
                   activityTypeId = ${activityTypeId}, scopeId = ${scopeId} `;
@@ -209,9 +211,11 @@ async function redeemCart(details){
 }
 
 async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalPoints,activityTypeIds,appUser){
+    var createdAt =moment(new Date()).valueOf();
+    var updatedAt =moment(new Date()).valueOf();
       const SQL = `INSERT INTO appuseractivity
                                   SET
-                                  createdAt = CURRENT_TIMESTAMP, updatedAt = CURRENT_TIMESTAMP,
+                                  createdAt = ${createdAt}, updatedAt = ${updatedAt},
                                   createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
                                   pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
                                   activityTypeId = ${activityTypeIds}`;
@@ -242,9 +246,9 @@ async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalP
     }
 
 function reportByActivityType(userId) {
-  const SQL = `select l.lookupTypeId, l.lookupId, l.displayValue, sumByType.pointsReceived from lookup l
+  const SQL = `select l.lookupTypeId, l.lookupId, l.displayValue, sumByType.pointsReceived, sumByType.createdAt from lookup l
   left join
-  (SELECT activityTypeId, sum(pointsReceived) as pointsReceived FROM cms_dev_cart.appuseractivity where appUserId = ${userId} group by activityTypeId) as sumByType on sumByType.activityTypeId = l.lookupId
+  (SELECT activityTypeId, createdAt, sum(pointsReceived) as pointsReceived FROM appuseractivity where appUserId = ${userId} group by activityTypeId) as sumByType on sumByType.activityTypeId = l.lookupId
   where sumByType.pointsReceived is not null
   `;
   return new Promise((resolve, reject) => {

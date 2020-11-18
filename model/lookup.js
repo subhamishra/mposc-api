@@ -188,6 +188,44 @@ function getLookupById(lookupId) {
   });
 }
 
+// {
+//   displayValue: "Stroller",
+//     customValue: null,
+//   customStringValue: {
+//   "ImagePath": "Stroller.png",
+//     "Description": "Test",
+// },
+//   points: "1500",
+// }
+
+function createloockup(values) {
+  const SQL = `INSERT INTO lookup
+              ( displayValue,
+                customValue,
+                customStringValue,
+                points
+              ) values
+              (?, ?, ?, ?)`;
+  const { displayValue, customValue, customStringValue, points } = values;
+  const updateValues = [displayValue, customValue, customStringValue, points];
+  return new Promise((resolve, reject) => {
+    pool.query(SQL, updateValues, (err, result) => {
+      if (err) {
+        console.log(err);
+        resolve({
+          isError: true,
+          err: err,
+        })
+      } else {
+        resolve({
+          isError: false,
+          result: result
+        })
+      }
+    });
+  })
+}
+
 module.exports = {
   lookuptype: lookuptype,
   lookupByTypeId: lookupByTypeId,
@@ -196,4 +234,5 @@ module.exports = {
   addlookupType: addlookupType,
   deleteLookupType: deleteLookupType,
   addlookup: addlookup,
+  createloockup:createloockup
 }
