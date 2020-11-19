@@ -1,10 +1,11 @@
 const educationData = require('./data/educationVideos');
-
 const question = require('../../model/question');
 const video = require('../../model/videos');
 
+const lookup = require('../../model/lookup');
+
 function educationSetup() {
-  educationData.Data.forEach(async (data, index) => {
+    educationData.Data.forEach(async (data, index) => {
     console.log("inserting video with index: ", index);
     const videoInsertResp = await video.createVideo(data);
     if (videoInsertResp.isError){
@@ -17,4 +18,4 @@ function educationSetup() {
   })
 }
 
-module.exports = educationSetup
+module.exports = {educationSetup:educationSetup};

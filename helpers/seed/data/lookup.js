@@ -45,7 +45,7 @@ const ItemsData = {
           "Description": "Provides baby with secure learn and play environment.\\r\\nGross motor skills, fine motor skills, object exploration, cause/effect learning, self-awareness, tactile development, visual development, object permanence, hand-eye coordination.\\r\\nPhysical exercise to develop baby's neck, back and leg muscles and improve gross motor skills."
         },
         points: "1000",
-        
+
     },
     {
         displayValue: "High Chair",
@@ -302,12 +302,36 @@ const CartStatus = {
   ]
 }
 
-// const LookupType = {
-//   lookupType: "AppUserActivityType",
-//   description: "This is used for app user activity. e.g. redeeming points, receiving points",
-// }
+const AppUserActivityType = {
+    lookupType: {
+        lookupType: "AppUserActivityType",
+        description: "This is used for saving the status of user activity"
+    },
+    lookups: [
+        {
+            displayValue: "QuizPointReceive",
+            customValue: null,
+            customStringValue: null,
+            points: null
+        },
+        {
+            displayValue: "VideoPointReceive",
+            customValue: null,
+            customStringValue: null,
+            points: null
+
+        },
+        {
+            displayValue: "AppointmentPointReceive",
+            customValue: null,
+            customStringValue: null,
+            points: null
+        }
+    ]
+};
 
 module.exports = [
   ItemsData,
   CartStatus,
-]
+  AppUserActivityType,
+];

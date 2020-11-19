@@ -10,13 +10,13 @@ const Data = [
         {
           question: "Which of these is not part of the Safe2Sleep program?",
           options: ["Swaddling", "Empty Crib", "Sleep Alone", "Smoke Free"],
-          correctAnswerIndex: 0,
+          correctAnswerIndex: 0
         },
         {
           question: "What IS allowed in the crib?",
           options: ["Fitted sheet", "Blanket", "Toys", "Bumpers"],
-          correctAnswerIndex: 0,
-        },
+          correctAnswerIndex: 0
+        }
     ]
   },
   {
@@ -30,12 +30,12 @@ const Data = [
       {
         question: "What are some good reasons to breastfeed?",
         options: ["Helps you to lose weight after the baby is born", "Helps the baby to get the best food", "Helps the baby to be as healthy as possible", "All of the above"],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 3
       },
       {
         question: "Which of the following are times when you should NOT breastfeed?",
         options: ["The mom has HIV or tuberculosis", "The mom is still working on her recovery", "All of the above"],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 2
       },
     ]
   },
@@ -109,4 +109,4 @@ const LookupType = "MicrolearningEducationVideo"
 module.exports = {
   Data: Data,
   LookupType: LookupType,
-}
+};

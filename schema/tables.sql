@@ -20,7 +20,7 @@ CREATE TABLE `appuser` (
   PRIMARY KEY (`userId`),
   UNIQUE KEY `userId` (`userId`),
   UNIQUE KEY `emailAddress` (`emailAddress`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `appuseractivity`;
 
@@ -38,7 +38,7 @@ CREATE TABLE `appuseractivity` (
   `activityTypeId` int(11) NOT NULL, -- it is the lookup id for ActivityType lookup type
   PRIMARY KEY (`appuserActivityId`),
   UNIQUE KEY `appuserActivityId` (`appuserActivityId`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `videos`;
 
@@ -52,7 +52,7 @@ CREATE TABLE `videos` (
   `quizPoints` int(20) DEFAULT 0,
   PRIMARY KEY (`videoId`),
   UNIQUE KEY `videoId` (`videoId`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `quizquestions`;
 
@@ -64,7 +64,7 @@ CREATE TABLE `quizquestions` (
   `correctAnswerIndex` INT(2) NOT NULL,
   PRIMARY KEY (`quizquestionsId`),
   UNIQUE KEY `quizquestionsId` (`quizquestionsId`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `cart`;
 /*!40101 SET @saved_cs_client = @@character_set_client */;
@@ -78,8 +78,21 @@ CREATE TABLE `cart` (
 `status` int(11) DEFAULT NULL,
 PRIMARY KEY (`cartId`),
 UNIQUE KEY `cartId_UNIQUE` (`cartId`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
--- ALTER TABLE `lookup` ADD `points` int(10) DEFAULT NULL;
+
+
+ALTER TABLE `lookup` ADD `points` int(10) DEFAULT NULL;
+
+ALTER TABLE caseappointment
+ADD caseContactId int(11) DEFAULT NULL;
+
+ALTER TABLE casecontact
+ADD organisation varchar(255);
+
+ALTER TABLE casecontact
+ADD email varchar(255);
+
+ALTER TABLE lookup CHANGE COLUMN customStringValue customStringValue VARCHAR(1000);
