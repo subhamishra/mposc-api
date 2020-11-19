@@ -47,12 +47,12 @@ module.exports = {
       const currentLoggedUser = req.body.userId;
       const options = {
         page: parseInt(req.query.page) || 0,
-        limit: parseInt(req.query.limit) || 10,
+        limit: parseInt(req.query.limit) || 10
       };
       const rooms = await ChatRoomModel.getChatRoomsByUserId(currentLoggedUser);
       const roomIds = rooms.result.map(room => room.id);
       const recentConversation = await ChatMessageModel.getRecentConversation(
-        roomIds.join(), options, currentLoggedUser
+        roomIds.join(),req.body , options, currentLoggedUser
       );
       return res.status(200).send({ isError: false, conversation: recentConversation.result });
     } catch (error) {

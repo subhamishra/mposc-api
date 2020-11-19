@@ -32,7 +32,7 @@ async function getConversationByRoomId(chatRoomId, options = {}) {
     return this.aggregate([
       { $match: { chatRoomId } },
       { $sort: { createdAt: -1 } },
-      // do a join on another table called users, and 
+      // do a join on another table called users, and
       // get me a user whose _id = postedByUser
       {
         $lookup: {
@@ -78,8 +78,8 @@ async function markMessageRead(chatRoomId, currentUserOnlineId) {
 }
 
 
-function getRecentConversation(chatRoomIds, options, currentUserOnlineId) {
-  const SQL = `SELECT cr.userIds, cr.id, cm.message, cm.postedByUser, cm.readByUser, cm.createdAt, cm.updatedAt FROM chatrooms cr inner join chatmessages cm on cr.id = cm.chatroomId where cr.id in (${chatRoomIds})`;
+function getRecentConversation(chatRoomIds, details, options, currentUserOnlineId) {
+  const SQL = `SELECT cr.userIds, cr.id, cm.message, cm.postedByUser, cm.readByUser, cm.createdAt, cm.updatedAt FROM chatrooms cr inner join chatmessages cm on cr.id = cm.chatroomId where cr.id in (${chatRoomIds}) ORDER BY cr.updatedAt DESC LIMIT 1`;
   return new Promise((resolve, reject) => {
     pool.query(SQL, [], (err, result) => {
       if (err) {
@@ -89,9 +89,40 @@ function getRecentConversation(chatRoomIds, options, currentUserOnlineId) {
           error: err,
         })
       } else {
-        resolve({
-          isError: false,
-          result: result
+        // result.
+        var appUserId = '';
+        var webUserId = '';
+        var usersIds = result[0].userIds.split(',');
+        if(details.requestFrom == 'app'){
+          appUserId = details.userId;
+          usersIds.forEach(res=>{
+            if(res != details.userId)
+              webUserId = res;
+          })
+        }else{
+          webUserId = details.userId;
+          usersIds.forEach(res=>{
+            if(res != details.userId)
+              appUserId = res;
+        })
+        }
+
+        const userSQL = `SELECT fullName FROM appuser where userId = ${appUserId} UNION
+                              SELECT fullName FROM user where userId = ${webUserId}`;
+        pool.query(userSQL , (err, userNamesresult)=>{
+          if(err){
+            resolve({
+              isError: true,
+              err: err
+            })
+          }else{
+            result.users = [{id : appUserId , name:userNamesresult[0].fullName},
+              {id : webUserId , name:userNamesresult[1].fullName}]
+          }
+          resolve({
+                    isError: false,
+                    result: result
+                  })
         })
       }
     });
