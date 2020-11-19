@@ -3,6 +3,8 @@ var router = express.Router();
 const find = require('../model/appUser.js').find
 const getProfile = require('../model/appUser.js').getProfile;
 const updateProfile = require('../model/appUser.js').updateProfile;
+const appUsersList = require('../model/appUser.js').appUsersList;
+const webUsersList = require('../model/appUser.js').webUsersList;
 
 
 router.post('/login', async function (req, res, next) {
@@ -50,6 +52,25 @@ router.get('/profile', async function (req, res, next) {
 router.post('/profile', async function (req, res, next) {
   // const userId = req.body;
   const data = await updateProfile(req.body);
+  if (data.isError) {
+    res.send(data);
+  } else {
+    res.send(data);
+  }
+});
+router.get('/appUsersList', async function (req, res, next) {
+  // const userId = req.body;
+  const data = await appUsersList();
+  if (data.isError) {
+    res.send(data);
+  } else {
+    res.send(data);
+  }
+});
+
+router.get('/webUsersList', async function (req, res, next) {
+  // const userId = req.body;
+  const data = await webUsersList();
   if (data.isError) {
     res.send(data);
   } else {

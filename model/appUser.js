@@ -130,6 +130,46 @@ function updateProfile(values) {
   });
 }
 
+function appUsersList(){
+  const SQL = `select emailAddress, fullName, userId, caseId, points from appuser`;
+  return new Promise((resolve, reject)=>{
+    pool.query(SQL,(err,result)=>{
+      if(err){
+        resolve({
+          isError: true,
+          err: err
+        })
+      }else{
+        resolve({
+                  isError: false,
+                  message: "successfully fetched",
+                  result: result
+                })
+      }
+    })
+  });
+}
+
+function webUsersList (){
+  const SQL = `select emailAddress, fullName, userId from user`;
+  return new Promise((resolve, reject)=>{
+    pool.query(SQL,(err,result)=>{
+      if(err){
+        resolve({
+          isError: true,
+          err: err
+        })
+      }else{
+        resolve({
+                  isError: false,
+                  message: "successfully fetched",
+                  result: result
+                })
+      }
+    })
+});
+}
+
 module.exports = {
   login: login,
   addUser: addUser,
@@ -138,4 +178,6 @@ module.exports = {
   getProfile: getProfile,
   updateProfile: updateProfile,
   updateAppUser: updateAppUser,
+  appUsersList: appUsersList,
+  webUsersList: webUsersList
 }
