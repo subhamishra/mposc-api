@@ -4,6 +4,7 @@ const makeValidation = require('@withvoid/make-validation');
 const ChatRoomModel = require('../model/chatRoom.js');
 const ChatMessageModel = require('../model/ChatMessage.js');
 const UserModel = require('../model/appUser.js');
+const pool = require("../config/db.js");
 
 module.exports = {
   initiate: async (req, res) => {
@@ -62,16 +63,20 @@ module.exports = {
   getConversationByRoomId: async (req, res) => {
     try {
       const { roomId } = req.params;
-      const room = await ChatRoomModel.getChatRoomByRoomId(roomId)
+      const room = await ChatRoomModel.getChatRoomByRoomId(roomId);
       if (!room) {
         return res.status(400).json({
           isError: true,
           message: 'No room exists for this id',
         })
       }
+
+      const updatedRes = await updateRes(room.result,req.body);
+      const user ={user:updatedRes.result};
+      const rooms = {chatRoomDetails : room.result};
       return res.status(200).json({
         isError: false,
-        result: room.result,
+        result: [rooms,user],
       });
     } catch (error) {
       return res.status(500).json({ isError: true, error });
@@ -96,4 +101,45 @@ module.exports = {
       return res.status(500).send({ isError: true, error });
     }
   },
+}
+
+async function updateRes(res, details){
+  var appUserId = '';
+  var webUserId = '';
+  var usersIds = res[0].userIds.split(',');
+  if(details.requestFrom == 'app'){
+    appUserId = details.userId;
+    usersIds.forEach(result=>{
+      if(result != details.userId)
+        webUserId = result;
+  })
+  }else{
+    webUserId = details.userId;
+    usersIds.forEach(res=>{
+      if(result != details.userId)
+        appUserId = result;
+  })
+  }
+
+  const userSQL = `SELECT fullName FROM appuser where userId = ${appUserId} UNION
+                              SELECT fullName FROM user where userId = ${webUserId}`;
+  return new Promise((resolve, reject)=>{
+    pool.query(userSQL , (err, userNamesresult)=>{
+      if(err){
+        resolve({
+          isError: true,
+          err: err
+        })
+      }else{
+        var usersdata = [{id : appUserId , name:userNamesresult[0].fullName},
+          {id : webUserId , name:userNamesresult[1].fullName}];
+
+        resolve({
+          isError: false,
+          message: 'success',
+          result: usersdata
+        })
+      }
+});
+});
 }

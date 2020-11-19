@@ -118,11 +118,11 @@ function getRecentConversation(chatRoomIds, details, options, currentUserOnlineI
           }else{
             result.users = [{id : appUserId , name:userNamesresult[0].fullName},
               {id : webUserId , name:userNamesresult[1].fullName}]
+            resolve({
+                      isError: false,
+                      result: result
+                    })
           }
-          resolve({
-                    isError: false,
-                    result: result
-                  })
         })
       }
     });
