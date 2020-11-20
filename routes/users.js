@@ -5,6 +5,7 @@ const getProfile = require('../model/appUser.js').getProfile;
 const updateProfile = require('../model/appUser.js').updateProfile;
 const appUsersList = require('../model/appUser.js').appUsersList;
 const webUsersList = require('../model/appUser.js').webUsersList;
+const saveConnectingCubeId = require('../model/appUser.js').saveConnectingCubeId;
 
 
 router.post('/login', async function (req, res, next) {
@@ -71,6 +72,16 @@ router.get('/appUsersList', async function (req, res, next) {
 router.get('/webUsersList', async function (req, res, next) {
   // const userId = req.body;
   const data = await webUsersList();
+  if (data.isError) {
+    res.send(data);
+  } else {
+    res.send(data);
+  }
+});
+
+router.post('/connectcubeid', async function (req, res, next) {
+  const {ConnectingCubeid, requestFrom, userId} = req.body;
+  const data = await saveConnectingCubeId(ConnectingCubeid,requestFrom, userId);
   if (data.isError) {
     res.send(data);
   } else {
