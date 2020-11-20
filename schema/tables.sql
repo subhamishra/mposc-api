@@ -97,5 +97,27 @@ ADD email varchar(255);
 
 ALTER TABLE lookup CHANGE COLUMN customStringValue customStringValue VARCHAR(1000);
 
-alter table chatrooms add column appUserId int(11) default null ,
-add column webUserId int(11) default null;
+
+CREATE TABLE `chatrooms` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userIds` varchar(225) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createdAt` bigint(20) DEFAULT NULL,
+  `updatedAt` bigint(20) DEFAULT NULL,
+  `appUserId` int(11) DEFAULT NULL,
+  `webUserId` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+
+
+CREATE TABLE `chatmessages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `chatRoomId` int(11) NOT NULL,
+  `message` varchar(225) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `postedByUser` int(11) NOT NULL,
+  `readByUser` int(11) DEFAULT NULL,
+  `createdAt` bigint(20) DEFAULT NULL,
+  `updatedAt` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
