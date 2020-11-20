@@ -8,7 +8,8 @@ var app = require('../app');
 var debug = require('debug')('mposc-api:server');
 var WebSockets = require('../utils/WebSockets.js');
 var server = require('http').createServer(app);
-var socketio = require('socket.io')(server);
+global.io = require('socket.io')(server);
+console.log("Global", global.io)
 
 /**
  * Get port from environment and store in Express.
@@ -26,8 +27,8 @@ app.set('port', port);
 /**
  * Create socket connection
  */
+var users = [];
 function connection(client) {
-  var users = [];
   // event fired when the chat room is disconnected
   client.on('disconnect', () => {
     console.log(this)
@@ -41,13 +42,18 @@ function connection(client) {
     })
   })
   // subscribe person to chat & other user as well
-  client.on('subscribe', (room, otherUserId = '') => {
-    subscribeOtherUser(room, otherUserId);
-  client.join(room)
+  client.on('subscribe', (room, otherUserId) => {
+    const roomData = JSON.parse(room);
+    subscribeOtherUser(roomData.roomId, roomData.otherUserId);
+  client.join(roomData.roomId)
 })
   // mute a chat room
   client.on('unsubscribe', (room) => {
     client.leave(room)
+  })
+
+  client.on('test', (room) => {
+    console.log(room)
   })
 
   client.on('callUser', (data) => {
@@ -55,7 +61,7 @@ function connection(client) {
         (user) => user.userId === data.userToCall
 )
   if (userSocket && userSocket.socketId)
-    socketio.to(userSocket.socketId).emit('hey', {
+    global.io.to(userSocket.socketId).emit('hey', {
       signal: data.signalData,
       from: data.from,
     })
@@ -64,26 +70,26 @@ function connection(client) {
   client.on('acceptCall', (data) => {
     let userSocket = users.find((user) => user.userId === data.to)
   if (userSocket && userSocket.socketId) {
-    socketio.to(userSocket.socketId).emit('callAccepted', data.signal)
+    global.io.to(userSocket.socketId).emit('callAccepted', data.signal)
     console.log("Call Accepted", data.signal)
   }
 })
 }
 
 function subscribeOtherUser(room, otherUserId) {
-  const userSockets = users.filter((user) => user.userId === otherUserId)
+  const userSockets = users.filter((user) => user.userId.toString() === otherUserId.toString())
   userSockets.map((userInfo) => {
-    const socketConn = socketio.sockets.connected[userInfo.socketId]
+    const socketConn = global.io.sockets.connected[userInfo.socketId]
     if (socketConn) {
       socketConn.join(room)
     }
   })
 }
 
-socketio.on('connection', connection);
+global.io.on('connection', connection);
 
 /**
- * Listen on provided port, on all network interfaces.
+ * Listen on provided porten, on all network interfaces.
  */
 
 server.listen(port);
