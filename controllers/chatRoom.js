@@ -72,11 +72,9 @@ module.exports = {
       }
 
       const updatedRes = await updateRes(room.result,req.body);
-      const user ={user:updatedRes.result};
-      const rooms = {chatRoomDetails : room.result};
       return res.status(200).json({
         isError: false,
-        result: [rooms,user],
+        chatRoomDetails: { conversations: room.result, user: updatedRes.result},
       });
     } catch (error) {
       return res.status(500).json({ isError: true, error });
