@@ -8,7 +8,7 @@ var app = require('../app');
 var debug = require('debug')('mposc-api:server');
 var WebSockets = require('../utils/WebSockets.js');
 var server = require('http').createServer(app);
-global.io = require('socket.io')(server);
+var socketio = require('socket.io')(server);
 
 /**
  * Get port from environment and store in Express.
@@ -26,9 +26,61 @@ app.set('port', port);
 /**
  * Create socket connection
  */
+function connection(client) {
+  var users = [];
+  // event fired when the chat room is disconnected
+  client.on('disconnect', () => {
+    console.log(this)
+    users = users.filter((user) => user.socketId !== client.id)
+})
+  // add identity of user mapped to the socket id
+  client.on('identity', (userId) => {
+    users.push({
+      socketId: client.id,
+      userId: userId,
+    })
+  })
+  // subscribe person to chat & other user as well
+  client.on('subscribe', (room, otherUserId = '') => {
+    subscribeOtherUser(room, otherUserId);
+  client.join(room)
+})
+  // mute a chat room
+  client.on('unsubscribe', (room) => {
+    client.leave(room)
+  })
 
-// global.io = socketio.listen(server);
-global.io.on('connection', WebSockets.connection)
+  client.on('callUser', (data) => {
+    let userSocket = users.find(
+        (user) => user.userId === data.userToCall
+)
+  if (userSocket && userSocket.socketId)
+    socketio.to(userSocket.socketId).emit('hey', {
+      signal: data.signalData,
+      from: data.from,
+    })
+})
+
+  client.on('acceptCall', (data) => {
+    let userSocket = users.find((user) => user.userId === data.to)
+  if (userSocket && userSocket.socketId) {
+    socketio.to(userSocket.socketId).emit('callAccepted', data.signal)
+    console.log("Call Accepted", data.signal)
+  }
+})
+}
+
+function subscribeOtherUser(room, otherUserId) {
+  const userSockets = users.filter((user) => user.userId === otherUserId)
+  userSockets.map((userInfo) => {
+    const socketConn = socketio.sockets.connected[userInfo.socketId]
+    if (socketConn) {
+      socketConn.join(room)
+    }
+  })
+}
+
+socketio.on('connection', connection);
 
 /**
  * Listen on provided port, on all network interfaces.
