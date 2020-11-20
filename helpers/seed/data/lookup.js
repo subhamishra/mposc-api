@@ -282,22 +282,13 @@ const CartStatus = {
   lookups: [
     {
       displayValue: "InCart",
-      customValue: null,
-      customStringValue: null,
-      points: null,
     },
     {
       displayValue: "Redeemed",
-      customValue: null,
-      customStringValue: null,
-      points: null,
 
     },
     {
       displayValue: "Deleted",
-      customValue: null,
-      customStringValue: null,
-      points: null,
     },
   ]
 }
@@ -310,22 +301,13 @@ const AppUserActivityType = {
     lookups: [
         {
             displayValue: "QuizPointReceive",
-            customValue: null,
-            customStringValue: null,
-            points: null
         },
         {
             displayValue: "VideoPointReceive",
-            customValue: null,
-            customStringValue: null,
-            points: null
 
         },
         {
             displayValue: "AppointmentPointReceive",
-            customValue: null,
-            customStringValue: null,
-            points: null
         }
     ]
 };

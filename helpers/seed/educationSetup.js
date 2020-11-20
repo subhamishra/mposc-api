@@ -12,7 +12,7 @@ function educationSetup() {
       console.log(videoInsertResp);
     } else {
       console.log("inserting questions with index: ", index);
-      await question.createBatch(data.children || [], videoInsertResp.result.insertId);
+      data.children && await question.createBatch(data.children || [], videoInsertResp.result.insertId);
       console.log("inserted questions for index: ", index);
     }
   })
