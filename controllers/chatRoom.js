@@ -5,11 +5,12 @@ const ChatRoomModel = require('../model/chatRoom.js');
 const ChatMessageModel = require('../model/ChatMessage.js');
 const UserModel = require('../model/appUser.js');
 const pool = require("../config/db.js");
+const moment = require('moment');
 
 module.exports = {
   initiate: async (req, res) => {
     try {
-      const { userIds } = req.body;
+      const { userIds,appuserId,webuserId } = req.body;
       const chatRoom = await ChatRoomModel.checkAndGetRoom(userIds);
       if (!chatRoom.isError && chatRoom.result.length) {
         return res.status(200).send({
@@ -20,7 +21,7 @@ module.exports = {
         });
       }
 
-      const newRoom = await ChatRoomModel.initiateChat(userIds);
+      const newRoom = await ChatRoomModel.initiateChat(userIds, appuserId , webuserId);
       return res.status(200).json({
         success: true,
         isNew: true,
@@ -34,9 +35,9 @@ module.exports = {
   postMessage: async (req, res) => {
     try {
       const { roomId } = req.params;
-
+      var createdAt =moment(new Date()).valueOf();
       const currentLoggedUser = req.body.userId;
-      const post = await ChatMessageModel.createPostInChatRoom(roomId, req.body.messageText, currentLoggedUser);
+      const post = await ChatMessageModel.createPostInChatRoom(roomId, req.body.messageText, currentLoggedUser,createdAt);
       global.io.sockets.in(roomId).emit('new message', { message: post });
       return res.status(200).send({ isError: false, post });
     } catch (error) {

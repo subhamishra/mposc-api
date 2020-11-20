@@ -68,11 +68,11 @@ function checkAndGetRoom(userIds) {
   }
 }
 
-async function initiateChat(userIds) {
+async function initiateChat(userIds,appuserId,webuserId) {
   try {
     var createdAt =moment(new Date()).valueOf();
     var updatedAt =moment(new Date()).valueOf();
-    const SQL = `insert into chatrooms set userIds = "${userIds}", createdAt = ${createdAt} , updatedAt =${updatedAt}`;
+    const SQL = `insert into chatrooms set userIds = "${userIds}", createdAt = ${createdAt} , updatedAt =${updatedAt} ,appUserId = ${appuserId},webUserId=${webuserId}`;
     return new Promise((resolve, reject) => {
       pool.query(SQL, [], (err, result) => {
         if (err) {

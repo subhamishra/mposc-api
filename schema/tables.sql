@@ -96,3 +96,6 @@ ALTER TABLE casecontact
 ADD email varchar(255);
 
 ALTER TABLE lookup CHANGE COLUMN customStringValue customStringValue VARCHAR(1000);
+
+alter table chatrooms add column appUserId int(11) default null ,
+add column webUserId int(11) default null;
