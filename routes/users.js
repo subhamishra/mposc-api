@@ -22,7 +22,7 @@ router.post('/login', async function (req, res, next) {
     if (appUser.password == password) {
       res.send({
         isError: false,
-        userId: appUser.userId,
+        details:{userId: appUser.userId,connectingCubeId: appUser.connectingCubeId},
       });
     } else {
       res.send({
