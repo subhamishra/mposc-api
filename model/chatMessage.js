@@ -121,7 +121,7 @@ where cr.id in (${chatRoomIds})  ORDER BY cm.createdAt  DESC) as details group b
               isError:true,
               message: 'error while fetching user details'
             })
-          } else{finalObject.push(resultUser);}
+          } else{finalObject.push(resultUser.result);}
         }
   if(finalObject.isError){
     resolve({
