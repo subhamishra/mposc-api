@@ -79,7 +79,7 @@ router.get('/webUsersList', async function (req, res, next) {
   }
 });
 
-router.post('/connectcubeid', async function (req, res, next) {
+router.post('/connectycubeid', async function (req, res, next) {
   const {ConnectyCubeid, requestFrom, userId} = req.body;
   const data = await saveConnectyCubeId(ConnectyCubeid,requestFrom, userId);
   if (data.isError) {
