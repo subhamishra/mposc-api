@@ -1,11 +1,12 @@
 const pool = require("../config/db.js");
+const cartConstants = require('../constants/constant')
 
 async function addcart (details) {
   const {userId, lookupId, iswishlist,quantity,status} = details;
 
     const doesExist = await checkDoesExist(userId,lookupId);
     function checkDoesExist(userId,lookupId){
-      const SQL = `select * from cart where userId = ${userId} AND lookupId = ${lookupId} AND iswishlist =${iswishlist} AND status != ${status}`;
+      const SQL = `select * from cart where userId = ${userId} AND lookupId = ${lookupId} AND iswishlist =${iswishlist} AND status != ${cartConstants.cartConstants.ItemDeleted}`;
       return new Promise((resolve, reject) => {
         pool.query(SQL, (err, result) => {
           if (err) {
@@ -25,7 +26,7 @@ async function addcart (details) {
     }
      if(doesExist.result.length){
        const addQuantity = Number(doesExist.result[0].quantity)  + Number(quantity)  ;
-       const SQL = `UPDATE cart set quantity = ${addQuantity} where userId = ${userId} and lookupId = ${lookupId} and iswishlist = ${iswishlist}`;
+       const SQL = `UPDATE cart set quantity = ${addQuantity} where userId = ${userId} and lookupId = ${lookupId} and iswishlist = ${iswishlist} and status = ${cartConstants.cartConstants.ItemInCart}`;
        return new Promise((resolve, reject) => {
          pool.query(SQL, (err, result) => {
            if (err) {
@@ -43,7 +44,7 @@ async function addcart (details) {
          });
        })
      }else {
-       const SQL = `insert into cart set userId = ${userId}, lookupId = ${lookupId}, iswishlist = ${iswishlist} ,quantity = ${quantity},status=${status}`;
+       const SQL = `insert into cart set userId = ${userId}, lookupId = ${lookupId}, iswishlist = ${iswishlist} ,quantity = ${quantity}, status = ${cartConstants.cartConstants.ItemInCart}`;
        return new Promise((resolve, reject) => {
          pool.query(SQL, (err, result) => {
            if (err) {
@@ -66,9 +67,13 @@ async function addcart (details) {
 }
 
 function getcart (details) {
-  const {userId, iswishlist} = details;
-  const status = 281;
-  const SQL = `select * from cart where userId = ${userId} and iswishlist = ${iswishlist}`;
+  const {userId, iswishlist, status} = details;
+  // const status = 281;
+  var SQL = '';
+  if(iswishlist)
+    SQL = `select * from cart where userId = ${userId} and iswishlist = ${iswishlist}`;
+  else
+    SQL = `select * from cart where userId = ${userId} and iswishlist = ${iswishlist} and status != ${cartConstants.cartConstants.ItemDeleted}`;
   return new Promise((resolve, reject) => {
     pool.query(SQL, (err, result) => {
       if (err) {
@@ -132,8 +137,12 @@ async function updatecart (details) {
 }
 
 async function deleteItemInCartOrWishList(params){
-  const statusIdItemDeleted = 281;
-    const SQL = `update cart set quantity = ${params.quantity}, status = ${statusIdItemDeleted} where cartId = ${params.cartId} and lookupId = ${params.lookupId};`
+  const statusIdItemDeleted = params.status;
+  var SQL ='';
+  if(!params.isWishlist)
+    SQL = `UPDATE cart SET quantity = ${params.quantity}, status = ${cartConstants.cartConstants.ItemDeleted} WHERE cartId = ${params.cartId} and lookupId = ${params.lookupId};`;
+  else
+    SQL = `DELETE FROM cart WHERE cartId = ${params.cartId}`;
   return new Promise((resolve,reject)=>{
     pool.query(SQL,(err,result)=>{
       if(err){

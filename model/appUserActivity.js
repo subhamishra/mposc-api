@@ -4,6 +4,7 @@ const Lookup = require('./lookup');
 const Video = require('./videos');
 const Cart = require('./cart');
 const moment = require("moment");
+const cartConstants = require('../constants/constant');
 
 async function addActivity(details) {
   const { userId, scopeId, activityTypeId } = details;
@@ -218,7 +219,7 @@ async function insertAppUserActivity(userId,pointsRedeemed,pointsReceived,totalP
                                   createdAt = ${createdAt}, updatedAt = ${updatedAt},
                                   createdByUserId = ${userId}, modifiedByUserId = ${userId}, appUserId = ${userId},
                                   pointsRedeemed = ${pointsRedeemed}, pointsReceived = ${pointsReceived} , appuserBalancePoints = ${totalPoints},
-                                  activityTypeId = ${activityTypeIds}`;
+                                  activityTypeId = ${activityTypeIds}, status = ${cartConstants.cartConstants.ItemRedeemed}`;
       return new Promise((resolve, reject) => {
         pool.query(SQL,async ( err, result)=>{
           if(err){
