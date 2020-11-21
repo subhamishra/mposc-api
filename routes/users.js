@@ -5,7 +5,7 @@ const getProfile = require('../model/appUser.js').getProfile;
 const updateProfile = require('../model/appUser.js').updateProfile;
 const appUsersList = require('../model/appUser.js').appUsersList;
 const webUsersList = require('../model/appUser.js').webUsersList;
-const saveConnectingCubeId = require('../model/appUser.js').saveConnectingCubeId;
+const saveConnectyCubeId = require('../model/appUser.js').saveConnectyCubeId;
 
 
 router.post('/login', async function (req, res, next) {
@@ -22,7 +22,7 @@ router.post('/login', async function (req, res, next) {
     if (appUser.password == password) {
       res.send({
         isError: false,
-        details:{userId: appUser.userId,connectingCubeId: appUser.connectingCubeId},
+        details:{userId: appUser.userId,connectyCubeId: appUser.connectyCubeId},
       });
     } else {
       res.send({
@@ -80,8 +80,8 @@ router.get('/webUsersList', async function (req, res, next) {
 });
 
 router.post('/connectcubeid', async function (req, res, next) {
-  const {ConnectingCubeid, requestFrom, userId} = req.body;
-  const data = await saveConnectingCubeId(ConnectingCubeid,requestFrom, userId);
+  const {ConnectyCubeid, requestFrom, userId} = req.body;
+  const data = await saveConnectyCubeId(ConnectyCubeid,requestFrom, userId);
   if (data.isError) {
     res.send(data);
   } else {

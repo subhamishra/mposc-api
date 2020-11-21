@@ -131,7 +131,7 @@ function updateProfile(values) {
 }
 
 function appUsersList(){
-  const SQL = `select emailAddress, fullName, userId, caseId, points,connectingCubeId from appuser`;
+  const SQL = `select emailAddress, fullName, userId, caseId, points,connectyCubeId from appuser`;
   return new Promise((resolve, reject)=>{
     pool.query(SQL,(err,result)=>{
       if(err){
@@ -151,7 +151,7 @@ function appUsersList(){
 }
 
 function webUsersList (){
-  const SQL = `select emailAddress, fullName, userId, connectingCubeId from user`;
+  const SQL = `select emailAddress, fullName, userId, connectyCubeId from user`;
   return new Promise((resolve, reject)=>{
     pool.query(SQL,(err,result)=>{
       if(err){
@@ -170,9 +170,9 @@ function webUsersList (){
 });
 }
 
-function saveConnectingCubeId(ConnectingCubeId,requestFrom, userId){
- const SQL = requestFrom === 'app' ? `update appuser set connectingCubeId = '${ConnectingCubeId}' where userId = ${userId}` :
-     `update user set connectingCubeId = '${ConnectingCubeId}' where userId = ${userId}`;
+function saveConnectyCubeId(ConnectyCubeId,requestFrom, userId){
+ const SQL = requestFrom === 'app' ? `update appuser set connectyCubeId = '${ConnectyCubeId}' where userId = ${userId}` :
+     `update user set connectyCubeId = '${ConnectyCubeId}' where userId = ${userId}`;
   return new Promise((resolve, reject)=>{
     pool.query(SQL ,(err, result) =>{
       if(err){
@@ -200,5 +200,5 @@ module.exports = {
   updateAppUser: updateAppUser,
   appUsersList: appUsersList,
   webUsersList: webUsersList,
-  saveConnectingCubeId:saveConnectingCubeId
+  saveConnectyCubeId:saveConnectyCubeId
 }

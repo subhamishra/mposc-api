@@ -123,5 +123,5 @@ CREATE TABLE `chatmessages` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 
 
-alter table user add column connectingCubeId varchar(255) default null;
-alter table appuser add column connectingCubeId varchar(255) default null;
+alter table user add column connectyCubeId varchar(255) default null;
+alter table appuser add column connectyCubeId varchar(255) default null;
