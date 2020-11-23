@@ -38,7 +38,8 @@ module.exports = {
       var createdAt =moment(new Date()).valueOf();
       const currentLoggedUser = req.body.userId;
       const post = await ChatMessageModel.createPostInChatRoom(roomId, req.body.messageText, currentLoggedUser,createdAt);
-      global.io.sockets.in(roomId).emit('new message', { message: post });
+      const newMessage = await ChatMessageModel.getMessageById(post.result.insertId);
+      global.io.sockets.in(roomId).emit('new message', newMessage.result[0]);
       return res.status(200).send({ isError: false, post });
     } catch (error) {
       return res.status(500).send({ success: false, error: error })
@@ -115,8 +116,8 @@ async function updateRes(res, details){
   }else{
     webUserId = details.userId;
     usersIds.forEach(res=>{
-      if(result != details.userId)
-        appUserId = result;
+      if(res != details.userId)
+        appUserId = res;
   })
   }
 

@@ -1,5 +1,24 @@
 const pool = require("../config/db.js");
 
+function getMessageById(messageId) {
+  const SQL = `SELECT cm.chatRoomId, cm.message, cm.postedByUser, cm.readByUser, cr.userIds, cm.createdAt, cm.updatedAt FROM chatmessages cm inner join chatrooms cr on cm.chatRoomId = cr.id where cm.id = ${messageId}`;
+  return new Promise((resolve, reject) => {
+    pool.query(SQL, [], (err, result) => {
+      if (err) {
+        console.log(err);
+        resolve({
+          isError: true,
+          error: err,
+        })
+      } else {
+        resolve({
+                  isError: false,
+                  result: result
+                })
+      }
+    });
+})
+}
 
 function createPostInChatRoom(chatRoomId, message, postedByUser,createdAt) {
   try {
@@ -22,33 +41,6 @@ function createPostInChatRoom(chatRoomId, message, postedByUser,createdAt) {
     })
   } catch (error) {
     console.log('error on start chat method', error);
-    throw error;
-  }
-}
-
-
-async function getConversationByRoomId(chatRoomId, options = {}) {
-  try {
-    return this.aggregate([
-      { $match: { chatRoomId } },
-      { $sort: { createdAt: -1 } },
-      // do a join on another table called users, and
-      // get me a user whose _id = postedByUser
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'postedByUser',
-          foreignField: '_id',
-          as: 'postedByUser',
-        }
-      },
-      { $unwind: "$postedByUser" },
-      // apply pagination
-      { $skip: options.page * options.limit },
-      { $limit: options.limit },
-      { $sort: { createdAt: 1 } },
-    ]);
-  } catch (error) {
     throw error;
   }
 }
@@ -167,6 +159,6 @@ async function getUserDetails(userSQL,appUserId,webUserId, recentConversationDet
 module.exports = {
   getRecentConversation: getRecentConversation,
   markMessageRead: markMessageRead,
-  getConversationByRoomId: getConversationByRoomId,
   createPostInChatRoom: createPostInChatRoom,
+  getMessageById: getMessageById
 }

@@ -31,21 +31,23 @@ var users = [];
 function connection(client) {
   // event fired when the chat room is disconnected
   client.on('disconnect', () => {
-    console.log(this)
+    console.log('socket disconnected', client.id);
     users = users.filter((user) => user.socketId !== client.id)
 })
   // add identity of user mapped to the socket id
   client.on('identity', (userId) => {
     users.push({
       socketId: client.id,
-      userId: userId,
+      userId: userId.toString(),
     })
   })
   // subscribe person to chat & other user as well
   client.on('subscribe', (room, otherUserId) => {
-    const roomData = JSON.parse(room);
-    subscribeOtherUser(roomData.roomId, roomData.otherUserId);
-  client.join(roomData.roomId)
+    if(!(typeof(room) === 'number')){
+      const roomData = JSON.parse(room);
+      subscribeOtherUser(roomData.roomId, roomData.otherUserId);
+      client.join(roomData.roomId.toString())
+    }
 })
   // mute a chat room
   client.on('unsubscribe', (room) => {
@@ -81,7 +83,7 @@ function subscribeOtherUser(room, otherUserId) {
   userSockets.map((userInfo) => {
     const socketConn = global.io.sockets.connected[userInfo.socketId]
     if (socketConn) {
-      socketConn.join(room)
+      socketConn.join(room.toString())
     }
   })
 }
